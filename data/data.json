@@ -1,0 +1,23 @@
+{
+    "t_1905": {
+        "nodes": [
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 1
+            }
+        ],
+        "links": [
+            {
+                "source": 1,
+                "target": 5,
+                "weight": 1
+            }
+        ]
+    }
+}

@@ -1,0 +1,15 @@
+venv/
+
+ba_utils/.git
+
+plt_out/
+
+*.pkl
+*.parquet
+*.png
+
+
+.ipynb_checkpoints
+__pycache__/
+
+data/DynamicNetworks

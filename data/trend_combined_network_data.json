@@ -1,0 +1,3762 @@
+{
+    "t_1905": {
+        "nodes": [
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            }
+        ],
+        "links": [
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1906": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1907": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1909": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1910": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1911": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1912": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1913": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1914": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    },
+    "t_1915": {
+        "nodes": [
+            {
+                "id": 14,
+                "name": "Artist 14",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 8,
+                "name": "Artist 8",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 21,
+                "name": "Artist 21",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 2,
+                "name": "Artist 2",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 15,
+                "name": "Artist 15",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 9,
+                "name": "Artist 9",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 22,
+                "name": "Artist 22",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 3,
+                "name": "Artist 3",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 16,
+                "name": "Artist 16",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 10,
+                "name": "Artist 10",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 23,
+                "name": "Artist 23",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 4,
+                "name": "Artist 4",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 5,
+                "name": "Artist 5",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 17,
+                "name": "Artist 17",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 11,
+                "name": "Artist 11",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 18,
+                "name": "Artist 18",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 12,
+                "name": "Artist 12",
+                "num_exhibitions": 6
+            },
+            {
+                "id": 24,
+                "name": "Artist 24",
+                "num_exhibitions": 1
+            },
+            {
+                "id": 6,
+                "name": "Artist 6",
+                "num_exhibitions": 3
+            },
+            {
+                "id": 19,
+                "name": "Artist 19",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 13,
+                "name": "Artist 13",
+                "num_exhibitions": 7
+            },
+            {
+                "id": 7,
+                "name": "Artist 7",
+                "num_exhibitions": 4
+            },
+            {
+                "id": 20,
+                "name": "Artist 20",
+                "num_exhibitions": 2
+            },
+            {
+                "id": 1,
+                "name": "Artist 1",
+                "num_exhibitions": 4
+            }
+        ],
+        "links": [
+            {
+                "source": 14,
+                "target": 13,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 21,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 2,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 15,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 22,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 10,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 3,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 16,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 10,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 23,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 24,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 4,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 17,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 4,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 2,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 12,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 23,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 5,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 14,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 1,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 16,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 11,
+                "target": 9,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 18,
+                "target": 15,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 12,
+                "target": 21,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 24,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 6,
+                "target": 7,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 19,
+                "target": 22,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 11,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 13,
+                "target": 3,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 7,
+                "target": 19,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 6,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 20,
+                "target": 8,
+                "weight": 1,
+                "influence": 0.0
+            },
+            {
+                "source": 1,
+                "target": 17,
+                "weight": 1,
+                "influence": 0.0
+            }
+        ],
+        "num_exhibitions": 7
+    }
+}
