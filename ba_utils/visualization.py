@@ -115,7 +115,8 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=Fal
                     color='white', 
                     ha='center', 
                     va='center',
-                    fontsize=12
+                    #fontsize=12
+                    fontsize=pixel_size * 0.3
                 )
 
     ax.set_xlim(0, len(timestamps) * pixel_size)
@@ -261,8 +262,29 @@ def draw_rug_plot_without_ids(data, ordering, pixel_size=40):
 
     return fig
 
-# generate plots for multiple orderings
+# generate plots for multiple orderings, given the desired color encoding color_encodings = 
 def draw_all_colored(graphs, title="", save=False, color_encoding='degree_centrality', labels=False):
+    """
+    Visualizes multiple graph orderings using subplots, with optional color encoding and labeling.
+    Parameters:
+        graphs (list): A list of graph objects to be visualized.
+        title (str, optional): A title for the visualization. Defaults to an empty string.
+        save (bool, optional): If True, saves the figure to a file. Defaults to False.
+        color_encoding (str, optional): The attribute used for node color encoding. 
+            Defaults to 'degree_centrality'. 
+            Options ["degree_centrality", "degree", "eigenvector_centrality","closeness_centrality", "betweenness_centrality","id2", "id3"]
+        labels (bool, optional): If True, displays labels on the nodes. Defaults to False.
+    Returns:
+        matplotlib.figure.Figure: The generated figure containing the visualizations.
+    Notes:
+        - The function generates subplots for different graph orderings, including DFS, BFS 
+          (with various sorting keys), priority-based BFS, community-based ordering, degree-based 
+          ordering, and centrality-based orderings (eigenvector and closeness).
+        - If `save` is True, the figure is saved in the `plt_out` directory relative to the script's 
+          location, with a filename based on the `title` and `color_encoding`.
+        - The function uses helper functions such as `draw_rug_from_graphs` and ordering functions 
+          from the `orderings` module to generate the visualizations.
+    """
     fig, axes = plt.subplots(1, 8, figsize=(20, 6))
     
     dfs_ordering = orderings.get_DFS_ordering(graphs)
