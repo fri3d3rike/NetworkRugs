@@ -8,6 +8,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from ba_utils.orderings import get_priority_bfs_ordering
 from ba_utils.visualization import draw_rug_from_graphs
 
+#python -m ba_utils.vnetwork_rugs
+
 
 # --- Drawing Function ---
 def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False, pixel_size=6, ax=None):
@@ -30,7 +32,7 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False,
 
 # --- Jupyter Notebook Interface ---
 def interactive_rug(graphs):
-    color_options = ['id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality']
+    color_options = ['id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
     color_dropdown = Dropdown(options=color_options, value='closeness_centrality', description='Color:')
     label_toggle = Checkbox(value=False, description='Show Labels')
     pixel_slider = IntSlider(value=6, min=2, max=20, step=1, description='Pixel Size:', continuous_update=False)
@@ -84,7 +86,7 @@ def launch_tkinter_ui(graphs):
     # --- Color Dropdown ---
     ttk.Label(control_frame, text="Color Encoding:").grid(row=0, column=0, sticky='e', padx=5)
     color_box = ttk.Combobox(control_frame, textvariable=color_var, values=[
-        'id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality'])
+        'id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality'])
     color_box.grid(row=0, column=1, padx=5)
 
     # --- Label Checkbox ---
