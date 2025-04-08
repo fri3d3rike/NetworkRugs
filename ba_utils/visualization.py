@@ -11,7 +11,10 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from PIL import Image
 
-linear_mapper = colormap.LinearHSVColorMapper(colormap="seismic")
+# run this command to run
+# python -m ba_utils.visualization
+
+#linear_mapper = colormap.LinearHSVColorMapper(colormap="seismic")
 binned_mapper = colormap.BinnedPercentileColorMapper( colormap="seismic", bins=10)
 
 def normalize(values_dict, min_val=None, max_val=None):
@@ -36,7 +39,15 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=Fal
     centrality_encodings = ['betweenness_centrality', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality']
     timestamps = sorted(graphs_data.keys())
     num_artists = len(ordering[next(iter(ordering))])
-    max_size = 20
+    
+    all_ids = {id for ts in ordering for id in ordering[ts]}
+    min_id, max_id = min(all_ids), max(all_ids)
+    
+    id_mapper = colormap.LinearHSVColorMapper(max_id, min_id)
+    
+    #max_size = 20
+    max_size = max(10, min(30, len(timestamps) * pixel_size / 100))
+
     fig_width = min(len(timestamps) * pixel_size / 100, max_size)
     fig_height = min(num_artists * pixel_size / 100, max_size)
 
@@ -87,7 +98,8 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=Fal
             elif color_encoding == 'id2':
                 color = colormap.get_color_by_id2(artist_id, num_artists)
             elif color_encoding == 'id3':
-                color = colormap.get_color_by_id3(artist_id, num_artists)
+                #color = colormap.get_color_by_id3(artist_id, num_artists)
+                color = id_mapper.get_color_by_value(artist_id)
             elif color_encoding == 'betweenness_centrality':
                 color = binned_mapper.get_color_by_value(normalized_centralities[timestamp][artist_id])
             elif color_encoding == 'degree_centrality':
@@ -115,7 +127,8 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=Fal
                     color='white', 
                     ha='center', 
                     va='center',
-                    fontsize=12
+                    #fontsize=12
+                    fontsize=pixel_size * 0.3
                 )
 
     ax.set_xlim(0, len(timestamps) * pixel_size)
@@ -261,8 +274,29 @@ def draw_rug_plot_without_ids(data, ordering, pixel_size=40):
 
     return fig
 
-# generate plots for multiple orderings
+# generate plots for multiple orderings, given the desired color encoding color_encodings = 
 def draw_all_colored(graphs, title="", save=False, color_encoding='degree_centrality', labels=False):
+    """
+    Visualizes multiple graph orderings using subplots, with optional color encoding and labeling.
+    Parameters:
+        graphs (list): A list of graph objects to be visualized.
+        title (str, optional): A title for the visualization. Defaults to an empty string.
+        save (bool, optional): If True, saves the figure to a file. Defaults to False.
+        color_encoding (str, optional): The attribute used for node color encoding. 
+            Defaults to 'degree_centrality'. 
+            Options ["degree_centrality", "degree", "eigenvector_centrality","closeness_centrality", "betweenness_centrality","id2", "id3"]
+        labels (bool, optional): If True, displays labels on the nodes. Defaults to False.
+    Returns:
+        matplotlib.figure.Figure: The generated figure containing the visualizations.
+    Notes:
+        - The function generates subplots for different graph orderings, including DFS, BFS 
+          (with various sorting keys), priority-based BFS, community-based ordering, degree-based 
+          ordering, and centrality-based orderings (eigenvector and closeness).
+        - If `save` is True, the figure is saved in the `plt_out` directory relative to the script's 
+          location, with a filename based on the `title` and `color_encoding`.
+        - The function uses helper functions such as `draw_rug_from_graphs` and ordering functions 
+          from the `orderings` module to generate the visualizations.
+    """
     fig, axes = plt.subplots(1, 8, figsize=(20, 6))
     
     dfs_ordering = orderings.get_DFS_ordering(graphs)
