@@ -8,16 +8,26 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from ba_utils.orderings import get_priority_bfs_ordering
 from ba_utils.visualization import draw_rug_from_graphs
 
-#python -m ba_utils.vnetwork_rugs
+#python -m ba_utils.network_rugs
 
 
 # --- Drawing Function ---
-def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False, pixel_size=6, ax=None):
+def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False, pixel_size=6, order="", ax=None, start_nodes=None):
     """
     Draws a single NetworkRug with a specific color encoding and pixel size.
     Adjusts figure size dynamically to support scalability in node/time dimensions.
+    
+    Use this for start_nodes
+    start_nodes = {timestamp: 15 for timestamp in test.keys()}
     """
-    ordering = get_priority_bfs_ordering(graphs)
+    if order == "prio":
+        ordering = get_priority_bfs_ordering(graphs, start_nodes)
+    if order == "bfs":
+        ordering = get_priority_bfs_ordering(graphs, start_nodes)
+    if order == "dfs":
+        ordering = get_priority_bfs_ordering(graphs, start_nodes)
+    else:
+        ordering = get_priority_bfs_ordering(graphs, start_nodes)
 
     fig = draw_rug_from_graphs(
         graphs_data=graphs,
@@ -72,6 +82,7 @@ def launch_tkinter_ui(graphs):
 
     root = tk.Tk()
     root.title("NetworkRug Visualizer")
+    #window.geometry("widthxheight+XPOS+YPOS")
     root.geometry("1600x800")  # Default window size
 
     # --- Variables ---
