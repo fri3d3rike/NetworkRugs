@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import ba_utils.orderings as orderings
-import ba_utils.color as colormap
+import ba_utils.color as colorMapper
 import os
 import networkx as nx
 
@@ -15,7 +15,7 @@ from PIL import Image
 # python -m ba_utils.visualization
 
 #linear_mapper = colormap.LinearHSVColorMapper(colormap="seismic")
-binned_mapper = colormap.BinnedPercentileColorMapper( colormap="seismic", bins=10)
+binned_mapper = colorMapper.BinnedPercentileColorMapper( colormap="seismic", bins=10)
 
 def normalize(values_dict, min_val=None, max_val=None):
     if max_val == min_val:
@@ -23,33 +23,60 @@ def normalize(values_dict, min_val=None, max_val=None):
         return {k: 0.5 for k in values_dict}
     return {k: (v - min_val) / (max_val - min_val) for k, v in values_dict.items()}
 
-def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=False, pixel_size=40, ax=None):
+def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colormap='turbo',
+                         labels=False, pixel_size=None, ax=None, 
+                         target_width_px=1600, target_height_px=900, dpi=100):
     """
-    Draws a rug plot from a series of graph data.
+    Draws a rug plot from a series of graphs data, with dynamic layout that can fit the figure
+    into a specified pixel window (e.g., 1600x900).
+
     Parameters:
     graphs_data (dict): A dictionary where keys are timestamps and values are networkx graphs.
     ordering (dict): A dictionary where keys are timestamps and values are lists of node IDs in the desired order.
-    color_encoding (str, optional): Method to encode colors. Options are 'id', 'id2', 'id3', 'betweenness_centrality', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality', and 'degree'. Default is 'id2'.
+    color_encoding (str, optional): Method to encode colors. Options are 'id', 'id2', 'id3', 
+        'betweenness_centrality', 'degree_centrality', 'closeness_centrality', 
+        'eigenvector_centrality', and 'degree'. Default is 'custom'.
+    colormap (str, optional): Name of the matplotlib colormap to use for continuous color encodings. Default is 'turbo'.
     labels (bool, optional): Whether to display labels on the plot. Default is False.
-    pixel_size (int, optional): Size of each pixel in the plot. Default is 40.
-    ax (matplotlib.axes.Axes, optional): Matplotlib Axes object to draw the plot on. If None, a new figure and axes are created. Default is None.
+    pixel_size (int, optional): If provided, sets the fixed size of each pixel in the plot. 
+        If None, the pixel size is automatically calculated to fit within the given target dimensions.
+    ax (matplotlib.axes.Axes, optional): Matplotlib Axes object to draw the plot on. 
+        If None, a new figure and axes are created.
+    target_width_px (int, optional): Desired total width of the figure in pixels. Used only if pixel_size is None.
+    target_height_px (int, optional): Desired total height of the figure in pixels. Used only if pixel_size is None.
+    dpi (int, optional): Dots per inch for the figure. Used for converting pixel dimensions to inches. Default is 100.
+
     Returns:
     matplotlib.figure.Figure or None: The figure object if a new one was created, otherwise None.
     """
+    fig = None
     centrality_encodings = ['betweenness_centrality', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality']
     timestamps = sorted(graphs_data.keys())
     num_artists = len(ordering[next(iter(ordering))])
+    print("num_artists", num_artists)
     
     all_ids = {id for ts in ordering for id in ordering[ts]}
-    min_id, max_id = min(all_ids), max(all_ids)
-    
-    id_mapper = colormap.LinearHSVColorMapper(max_id, min_id)
+    min_id, max_id = min(all_ids), max(all_ids)    
+    id_mapper = colorMapper.LinearHSVColorMapper(colormap=colormap, min_val=min_id, max_val=max_id)
+    print(f"colormap created with {colormap} and {min_id} to {max_id}")
     
     #max_size = 20
-    max_size = max(10, min(30, len(timestamps) * pixel_size / 100))
+    #max_size = max(10, min(30, len(timestamps) * pixel_size / 100))
 
-    fig_width = min(len(timestamps) * pixel_size / 100, max_size)
-    fig_height = min(num_artists * pixel_size / 100, max_size)
+    #fig_width = min(len(timestamps) * pixel_size / 100, max_size)
+    #fig_height = min(num_artists * pixel_size / 100, max_size)
+    
+    if pixel_size is None: 
+        # dynamic pixel size to fit figure
+        pixel_size_x = target_width_px // len(timestamps)
+        pixel_size_y = target_height_px // num_artists
+        pixel_size = min(pixel_size_x, pixel_size_y)  # to keep squares
+        
+        print("pixelsize updated to:", pixel_size)
+
+    # figure size in inches
+    fig_width = (len(timestamps) * pixel_size) / dpi
+    fig_height = (num_artists * pixel_size) / dpi
 
     if ax is None:
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
@@ -83,8 +110,6 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=Fal
                 max_degree_all = max(max_degree_all, max(degrees.values()))
                 min_degree_all = min(min_degree_all, min(degrees.values()))
         
-        #TODO: Add function to color by the number of exhibitions
-        
     for t_idx, timestamp in enumerate(timestamps):
         G = graphs_data[timestamp]
         node_order = ordering[timestamp]
@@ -94,11 +119,12 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=Fal
         
         for y_idx, artist_id in enumerate(node_order):
             if color_encoding == 'id':
-                color = colormap.get_color_by_id(artist_id, num_artists)
+                color = colorMapper.get_color_by_id(artist_id, num_artists)
             elif color_encoding == 'id2':
-                color = colormap.get_color_by_id2(artist_id, num_artists)
+                color = colorMapper.get_color_by_id2(artist_id, num_artists)
             elif color_encoding == 'id3':
-                #color = colormap.get_color_by_id3(artist_id, num_artists)
+                color = colorMapper.get_color_by_id3(artist_id, num_artists)
+            elif color_encoding =='custom':
                 color = id_mapper.get_color_by_value(artist_id)
             elif color_encoding == 'betweenness_centrality':
                 color = binned_mapper.get_color_by_value(normalized_centralities[timestamp][artist_id])
@@ -143,6 +169,12 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id2', labels=Fal
     # Only return the figure if a new one was created
     if ax is None:
         plt.show()
+        
+    if fig is None and ax is not None:
+        fig = ax.get_figure() 
+    
+    enable_hover(ax, fig, timestamps, ordering, pixel_size)
+    
     return fig if ax is None else None
 
 # Older versions
@@ -180,7 +212,7 @@ def draw_rug_plot_with_ids(data, ordering, pixel_size=40, ax=None):
 
         for y_idx, artist_id in enumerate(node_order):
             num_exhibitions = node_exhibitions.get(artist_id, 0)
-            color = colormap.get_color_by_id(artist_id, num_artists)
+            color = color.get_color_by_id(artist_id, num_artists)
             
             # matplotlib rectangle
             x_start = t_idx * pixel_size
@@ -251,7 +283,7 @@ def draw_rug_plot_without_ids(data, ordering, pixel_size=40):
             num_exhibitions = node_exhibitions.get(artist_id, 0)
             #print("id", artist_id, "num", num_exhibitions), 
             #color = get_color(num_exhibitions, max_exhibitions)
-            color = colormap.get_color_by_id(artist_id, num_artists)
+            color = color.get_color_by_id(artist_id, num_artists)
             
             # mathplotlib rectangle
             x_start = t_idx * pixel_size
@@ -482,7 +514,6 @@ def visualize_graphs(graphs, title=None, save=False):
         print(f"Figure saved as {os.path.abspath(output_path)}")
     return plt
 
-
 def visualize_adjacency_matrix(adjacency_matrix, node_order_in_matrix, title="Reordered Adjacency Matrix"):
     """
     Visualize a reordered adjacency matrix with custom node labels.
@@ -503,3 +534,45 @@ def visualize_adjacency_matrix(adjacency_matrix, node_order_in_matrix, title="Re
     plt.colorbar(label="Connection Strength")
     plt.grid(False)
     plt.show()
+    
+    
+    
+#### Interaction with Tkinter GUI
+
+def enable_hover(ax, fig, timestamps, ordering, pixel_size):
+    annot = ax.annotate(
+        "", xy=(0, 0), xytext=(10, 10), textcoords="offset points",
+        bbox=dict(boxstyle="round", fc="w"),
+        arrowprops=dict(arrowstyle="->")
+    )
+    annot.set_visible(False)
+
+    def motion(event):
+        if event.inaxes != ax or event.xdata is None or event.ydata is None:
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+            return
+
+        x_idx = int(event.xdata // pixel_size)
+        y_idx = int(event.ydata // pixel_size)
+
+        if x_idx >= len(timestamps):
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+            return
+
+        timestamp = timestamps[x_idx]
+        node_order = ordering.get(timestamp, [])
+        if y_idx >= len(node_order):
+            annot.set_visible(False)
+            fig.canvas.draw_idle()
+            return
+
+        node_id = node_order[y_idx]
+
+        annot.xy = (event.xdata, event.ydata)
+        annot.set_text(f"Time: {timestamp}\nNode ID: {node_id}")
+        annot.set_visible(True)
+        fig.canvas.draw_idle()
+
+    fig.canvas.mpl_connect("motion_notify_event", motion)
