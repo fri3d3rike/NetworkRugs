@@ -28,12 +28,28 @@ def sort_by_common_neighbors(graph, node):
     #print(timestamp, node, neighbors)
     return neighbors
 
+# Priority: combine edge weight, degree, and common neighbors
 def calculate_priority(graph, current_node, neighbor):
+    """
+    - calculates a priority score for a neighbor node based on a combination of edge weight,
+    node degree, and number of common neighbors
+    - intended for use in BFS traversal strategies where a priority queue is
+    used to determine the order of node expansion
+    - the computed priority ensures that nodes with stronger and more structurally significant connections are visited earlier.
+
+    Priority is defined as:
+        -edge_weight + 1 / (degree + 1) - number_of_common_neighbors
+
+    Note:
+        The priority is inverted (i.e., lower values are higher priority in a min-heap).
+
+    float
+        The computed priority score (lower values indicate higher priority).
+    """
     edge_weight = graph[current_node][neighbor].get('weight', 1)  # Default weight is 1
     degree = graph.degree(neighbor)  # Higher degree = more connections
     common_neighbors = len(list(nx.common_neighbors(graph, current_node, neighbor)))  # Number of common neighbors
 
-    # Priority: combine edge weight, degree, and common neighbors
     # Negative because min-heap (lower priority = higher value)
     return -edge_weight + 1 / (degree + 1) - common_neighbors
 

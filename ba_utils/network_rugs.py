@@ -5,17 +5,18 @@ import tkinter as tk
 from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from ba_utils.orderings import get_priority_bfs_ordering
+from ba_utils.orderings import *
 from ba_utils.visualization import draw_rug_from_graphs
 
 #python -m ba_utils.network_rugs
 
 
 # --- Drawing Function ---
-def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False, pixel_size=6, order="", ax=None, start_nodes=None):
+def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='turbo', labels=False, pixel_size=6, order="", ax=None, start_nodes=None):
     """
     Draws a single NetworkRug with a specific color encoding and pixel size.
     Adjusts figure size dynamically to support scalability in node/time dimensions.
+    calls draw_rug_from_graphs() from visualization.py
     
     Use this for start_nodes
     start_nodes = {timestamp: 15 for timestamp in test.keys()}
@@ -23,9 +24,11 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False,
     if order == "prio":
         ordering = get_priority_bfs_ordering(graphs, start_nodes)
     if order == "bfs":
-        ordering = get_priority_bfs_ordering(graphs, start_nodes)
+        ordering = get_BFS_ordering(graphs, start_nodes, sorting_key='weight')
     if order == "dfs":
-        ordering = get_priority_bfs_ordering(graphs, start_nodes)
+        ordering = get_DFS_ordering(graphs, start_nodes)
+    if order == "degree":
+        ordering = get_centrality_ordering(graphs, centrality_measure="degree")
     else:
         ordering = get_priority_bfs_ordering(graphs, start_nodes)
 
@@ -33,6 +36,7 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False,
         graphs_data=graphs,
         ordering=ordering,
         color_encoding=color_encoding,
+        colormap= colormap,
         labels=labels,
         pixel_size=pixel_size,
         ax=ax
@@ -42,17 +46,22 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', labels=False,
 
 # --- Jupyter Notebook Interface ---
 def interactive_rug(graphs):
-    color_options = ['id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
-    color_dropdown = Dropdown(options=color_options, value='closeness_centrality', description='Color:')
+    color_options = ['custom', 'id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
+    color_dropdown = Dropdown(options=color_options, value='custom', description='Color:')
+    
+    colormap_option = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
+    colormap_dropdown = Dropdown(options=colormap_option, value='turbo', description='Colormap:')
+    
     label_toggle = Checkbox(value=False, description='Show Labels')
     pixel_slider = IntSlider(value=6, min=2, max=20, step=1, description='Pixel Size:', continuous_update=False)
     
-    ui = VBox([HBox([color_dropdown, label_toggle, pixel_slider])])
+    ui = VBox([HBox([color_dropdown, colormap_dropdown, label_toggle, pixel_slider])])
 
     def update_plot(change=None):
-        draw_networkrug(graphs, color_encoding=color_dropdown.value, labels=label_toggle.value, pixel_size=pixel_slider.value)
+        draw_networkrug(graphs, color_encoding=color_dropdown.value, colormap=colormap_dropdown.value, labels=label_toggle.value, pixel_size=pixel_slider.value)
 
     color_dropdown.observe(update_plot, names='value')
+    colormap_dropdown.observe(update_plot, names='value')
     label_toggle.observe(update_plot, names='value')
     pixel_slider.observe(update_plot, names='value')
 

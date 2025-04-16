@@ -2,87 +2,6 @@ import networkx as nx
 import random
 import math
 
-def generate_dynamic_graphs_old(
-    num_nodes=30,
-    num_steps=10,
-    num_groups=1,
-    change_rate=0,
-    intra_community_strength=1.0,
-    inter_community_strength=0.1,
-    seed=42
-):
-    """
-    Generate dynamic graphs with evolving group structures and guaranteed connectedness.
-
-    Parameters:
-        num_nodes (int): Total number of nodes.
-        num_steps (int): Number of time steps (snapshots).
-        num_groups (int): Number of initial communities.
-        change_rate (float): Fraction of nodes changing group per step.
-        intra_community_strength (float): Probability of edge within a community (0 to 1).
-        inter_community_strength (float): Probability of edge between communities (0 to 1).
-        seed (int): Random seed for reproducibility.
-
-    Returns:
-        graphs (dict): timestep → nx.Graph
-        ground_truth (dict): timestep → {node: group}
-        change_log (dict): timestep → list of changed node IDs
-    """
-    random.seed(seed)
-    nodes = list(range(num_nodes))
-    community_assignment = {node: node % num_groups for node in nodes}
-
-    graphs = {}
-    ground_truth = {}
-    change_log = {}
-
-    for t in range(num_steps):
-        G = nx.Graph()
-        G.add_nodes_from(nodes)
-
-        # Add intra- and inter-community edges
-        for i in range(num_nodes):
-            for j in range(i+1, num_nodes):
-                same_group = community_assignment[i] == community_assignment[j]
-                p = intra_community_strength if same_group else inter_community_strength
-                if random.random() < p:
-                    G.add_edge(i, j, weight=1.0 if same_group else 0.3)
-
-        # Force minimal connectivity between communities
-        community_nodes = {g: [] for g in range(num_groups)}
-        for node, group in community_assignment.items():
-            community_nodes[group].append(node)
-
-        sorted_communities = sorted(community_nodes.keys())
-        for i in range(len(sorted_communities) - 1):
-            node_a = random.choice(community_nodes[sorted_communities[i]])
-            node_b = random.choice(community_nodes[sorted_communities[i + 1]])
-            G.add_edge(node_a, node_b, weight=0.01)  # Very weak connecting edge
-
-        # Store current graph and group structure
-        graphs[t] = G
-        ground_truth[t] = community_assignment.copy()
-
-        # Track community changes (from previous timestep)
-        if t > 0:
-            prev_assignment = ground_truth[t-1]
-            changed_nodes = [
-                node for node in nodes
-                if community_assignment[node] != prev_assignment[node]
-            ]
-            change_log[t] = changed_nodes
-
-        # Evolve group membership
-        num_changes = int(change_rate * num_nodes)
-        for _ in range(num_changes):
-            node = random.choice(nodes)
-            current_group = community_assignment[node]
-            new_group = random.choice([g for g in range(num_groups) if g != current_group])
-            community_assignment[node] = new_group
-
-    return graphs, ground_truth, change_log
-
-
 ''' Split triggered at time T: We identify the group to split, say group g.
 We gather that group’s nodes, shuffle them, and schedule them for “phased reassignment” over the next d steps.
 Phased Reassignment from T to T+d−1:
@@ -92,7 +11,7 @@ This looks more organic in your network, rather than an abrupt jump. '''
 
 def generate_dynamic_graphs(
     num_nodes=30,
-    num_steps=10,
+    num_steps=30,
     initial_groups=1,
     change_rate=0,
     intra_community_strength=1.0,
@@ -145,10 +64,6 @@ def generate_dynamic_graphs(
         #leftover nodes
         for node in nodes[initial_groups * nodes_per_group:]:
             community_assignment[node] = initial_groups - 1
-
-
-    
-    
     
     # Track active groups (these are the group IDs available so far)
     active_groups = set(range(initial_groups))
@@ -390,8 +305,6 @@ def generate_split_merge_data(
         seed=seed
     )
 
-
-
 def generate_proportional_transition(
     num_nodes=30,
     num_steps=10,
@@ -543,4 +456,86 @@ def generate_proportional_transition(
             changes = [n for n in nodes if community_assignment[n] != prev_state[n]]
             change_log[t] = changes
     
+    return graphs, ground_truth, change_log
+
+
+
+def generate_dynamic_graphs_old(
+    num_nodes=30,
+    num_steps=10,
+    num_groups=1,
+    change_rate=0,
+    intra_community_strength=1.0,
+    inter_community_strength=0.1,
+    seed=42
+):
+    """
+    Generate dynamic graphs with evolving group structures and guaranteed connectedness.
+
+    Parameters:
+        num_nodes (int): Total number of nodes.
+        num_steps (int): Number of time steps (snapshots).
+        num_groups (int): Number of initial communities.
+        change_rate (float): Fraction of nodes changing group per step.
+        intra_community_strength (float): Probability of edge within a community (0 to 1).
+        inter_community_strength (float): Probability of edge between communities (0 to 1).
+        seed (int): Random seed for reproducibility.
+
+    Returns:
+        graphs (dict): timestep → nx.Graph
+        ground_truth (dict): timestep → {node: group}
+        change_log (dict): timestep → list of changed node IDs
+    """
+    random.seed(seed)
+    nodes = list(range(num_nodes))
+    community_assignment = {node: node % num_groups for node in nodes}
+
+    graphs = {}
+    ground_truth = {}
+    change_log = {}
+
+    for t in range(num_steps):
+        G = nx.Graph()
+        G.add_nodes_from(nodes)
+
+        # Add intra- and inter-community edges
+        for i in range(num_nodes):
+            for j in range(i+1, num_nodes):
+                same_group = community_assignment[i] == community_assignment[j]
+                p = intra_community_strength if same_group else inter_community_strength
+                if random.random() < p:
+                    G.add_edge(i, j, weight=1.0 if same_group else 0.3)
+
+        # Force minimal connectivity between communities
+        community_nodes = {g: [] for g in range(num_groups)}
+        for node, group in community_assignment.items():
+            community_nodes[group].append(node)
+
+        sorted_communities = sorted(community_nodes.keys())
+        for i in range(len(sorted_communities) - 1):
+            node_a = random.choice(community_nodes[sorted_communities[i]])
+            node_b = random.choice(community_nodes[sorted_communities[i + 1]])
+            G.add_edge(node_a, node_b, weight=0.01)  # Very weak connecting edge
+
+        # Store current graph and group structure
+        graphs[t] = G
+        ground_truth[t] = community_assignment.copy()
+
+        # Track community changes (from previous timestep)
+        if t > 0:
+            prev_assignment = ground_truth[t-1]
+            changed_nodes = [
+                node for node in nodes
+                if community_assignment[node] != prev_assignment[node]
+            ]
+            change_log[t] = changed_nodes
+
+        # Evolve group membership
+        num_changes = int(change_rate * num_nodes)
+        for _ in range(num_changes):
+            node = random.choice(nodes)
+            current_group = community_assignment[node]
+            new_group = random.choice([g for g in range(num_groups) if g != current_group])
+            community_assignment[node] = new_group
+
     return graphs, ground_truth, change_log

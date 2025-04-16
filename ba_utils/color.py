@@ -9,6 +9,9 @@ class ColorMapper(ABC):
         pass
 
 class LinearHSVColorMapper(ColorMapper):
+    '''
+        linear normalization between a min_val and max_val
+    '''
     def __init__(self, max_val, min_val=0, colormap='turbo'):
         """
         Initializes the LinearHSVColorMapper with a specified matplotlib colormap.
