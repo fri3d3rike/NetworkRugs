@@ -12,7 +12,7 @@ from ba_utils.visualization import draw_rug_from_graphs
 
 
 # --- Drawing Function ---
-def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='turbo', labels=False, pixel_size=6, order="", ax=None, start_nodes=None):
+def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='turbo', labels=False, pixel_size=6, order="", ax=None, start_nodes=None, init_start=False):
     """
     Draws a single NetworkRug with a specific color encoding and pixel size.
     Adjusts figure size dynamically to support scalability in node/time dimensions.
@@ -21,7 +21,7 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='tur
     Use this for start_nodes
     start_nodes = {timestamp: 15 for timestamp in test.keys()}
     """
-    if order == "prio":
+    if order == "priority":
         ordering = get_priority_bfs_ordering(graphs, start_nodes)
     if order == "bfs":
         ordering = get_BFS_ordering(graphs, start_nodes, sorting_key='weight')
@@ -32,38 +32,71 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='tur
     else:
         ordering = get_priority_bfs_ordering(graphs, start_nodes)
 
-    fig = draw_rug_from_graphs(
-        graphs_data=graphs,
-        ordering=ordering,
-        color_encoding=color_encoding,
-        colormap= colormap,
-        labels=labels,
-        pixel_size=pixel_size,
-        ax=ax
-    )
+    if init_start:
+        init_graph = nx.Graph()
+        init_graph.add_nodes_from(range(graphs[0].number_of_nodes()))   
+        initial_ordering = list(range(graphs[0].number_of_nodes()))  # Simply 0, 1, 2, ..., 119
+        # Shift all other graphs forward in time
+        graphs_shifted = {t + 1: g for t, g in graphs.items()}
+        graphs_with_start = {0: init_graph}
+        graphs_with_start.update(graphs_shifted)
 
+        ordering_with_start = {0: initial_ordering}
+        ordering_with_start.update({t + 1: ordering[t] for t in ordering})
+
+        fig = draw_rug_from_graphs(
+            graphs_data=graphs_with_start,
+            ordering=ordering_with_start,
+            color_encoding=color_encoding,
+            colormap= colormap,
+            labels=labels,
+            pixel_size=pixel_size,
+            ax=ax
+        )
+    else:   
+        fig = draw_rug_from_graphs(
+            graphs_data=graphs,
+            ordering=ordering,
+            color_encoding=color_encoding,
+            colormap= colormap,
+            labels=labels,
+            pixel_size=pixel_size,
+            ax=ax
+        )
     return fig
 
 # --- Jupyter Notebook Interface ---
 def interactive_rug(graphs):
-    color_options = ['custom', 'id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
-    color_dropdown = Dropdown(options=color_options, value='custom', description='Color:')
+    color_options = [ 'id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
+    colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
     
-    colormap_option = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
-    colormap_dropdown = Dropdown(options=colormap_option, value='turbo', description='Colormap:')
-    
+    color_dropdown = Dropdown(options=color_options, value='id', description='Color:')
+    colormap_dropdown = Dropdown(options=colormap_options, value='turbo', description='Colormap:')
     label_toggle = Checkbox(value=False, description='Show Labels')
+    start_toggle = Checkbox(value=False, description='Show Start Node Layer')
     pixel_slider = IntSlider(value=6, min=2, max=20, step=1, description='Pixel Size:', continuous_update=False)
-    
-    ui = VBox([HBox([color_dropdown, colormap_dropdown, label_toggle, pixel_slider])])
+
+    ui = VBox([
+        HBox([color_dropdown, colormap_dropdown]),
+        HBox([label_toggle, start_toggle, pixel_slider])
+    ])
 
     def update_plot(change=None):
-        draw_networkrug(graphs, color_encoding=color_dropdown.value, colormap=colormap_dropdown.value, labels=label_toggle.value, pixel_size=pixel_slider.value)
+        draw_networkrug(
+            graphs,
+            color_encoding=color_dropdown.value,
+            colormap=colormap_dropdown.value,
+            labels=label_toggle.value,
+            pixel_size=pixel_slider.value,
+            init_start=start_toggle.value
+        )
 
+    # Attach all handlers
     color_dropdown.observe(update_plot, names='value')
     colormap_dropdown.observe(update_plot, names='value')
     label_toggle.observe(update_plot, names='value')
     pixel_slider.observe(update_plot, names='value')
+    start_toggle.observe(update_plot, names='value')
 
     display(ui)
     update_plot()

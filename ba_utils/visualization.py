@@ -15,7 +15,7 @@ from PIL import Image
 # python -m ba_utils.visualization
 
 #linear_mapper = colormap.LinearHSVColorMapper(colormap="seismic")
-binned_mapper = colorMapper.BinnedPercentileColorMapper( colormap="seismic", bins=10)
+#binned_mapper = colorMapper.BinnedPercentileColorMapper( colormap="seismic", bins=10)
 
 def normalize(values_dict, min_val=None, max_val=None):
     if max_val == min_val:
@@ -23,7 +23,7 @@ def normalize(values_dict, min_val=None, max_val=None):
         return {k: 0.5 for k in values_dict}
     return {k: (v - min_val) / (max_val - min_val) for k, v in values_dict.items()}
 
-def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colormap='turbo',
+def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='turbo',
                          labels=False, pixel_size=None, ax=None, 
                          target_width_px=1600, target_height_px=900, dpi=100):
     """
@@ -35,7 +35,7 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colorma
     ordering (dict): A dictionary where keys are timestamps and values are lists of node IDs in the desired order.
     color_encoding (str, optional): Method to encode colors. Options are 'id', 'id2', 'id3', 
         'betweenness_centrality', 'degree_centrality', 'closeness_centrality', 
-        'eigenvector_centrality', and 'degree'. Default is 'custom'.
+        'eigenvector_centrality', and 'degree'. Default is 'id'.
     colormap (str, optional): Name of the matplotlib colormap to use for continuous color encodings. Default is 'turbo'.
     labels (bool, optional): Whether to display labels on the plot. Default is False.
     pixel_size (int, optional): If provided, sets the fixed size of each pixel in the plot. 
@@ -54,11 +54,6 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colorma
     timestamps = sorted(graphs_data.keys())
     num_artists = len(ordering[next(iter(ordering))])
     print("num_artists", num_artists)
-    
-    all_ids = {id for ts in ordering for id in ordering[ts]}
-    min_id, max_id = min(all_ids), max(all_ids)    
-    id_mapper = colorMapper.LinearHSVColorMapper(colormap=colormap, min_val=min_id, max_val=max_id)
-    print(f"colormap created with {colormap} and {min_id} to {max_id}")
     
     #max_size = 20
     #max_size = max(10, min(30, len(timestamps) * pixel_size / 100))
@@ -82,34 +77,45 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colorma
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
     
     if color_encoding in centrality_encodings or color_encoding == 'degree':
-        # Get minimum and maximum across all timestamps
+        # Get minimum and maximum across all timestamps for global color_encoding
         min_degree_all = num_artists
         max_degree_all = 0
-        max_centrality_all = 0
-        min_centrality_all = 1
+        max_centrality_all = float('-inf')
+        min_centrality_all = float('inf')
         centralities = {}
         normalized_centralities = {}
         
         for timestamp in timestamps:
             G = graphs_data[timestamp]
-            degrees = dict(G.degree())
             if color_encoding == 'betweenness_centrality':
-                centralities[timestamp] = nx.betweenness_centrality(G, weight='weight')
+                centralities[timestamp] = nx.betweenness_centrality(G, normalized=True, weight='weight')
             elif color_encoding == 'degree_centrality':
-                centralities[timestamp] = nx.degree_centrality(G)
+                centralities[timestamp] = nx.degree_centrality(G, weight='weight')
             elif color_encoding == 'closeness_centrality':
-                centralities[timestamp] = nx.closeness_centrality(G)
+                centralities[timestamp] = nx.closeness_centrality(G, distance='weight')
             elif color_encoding == 'eigenvector_centrality':
                 centralities[timestamp] = nx.eigenvector_centrality(G, max_iter=10000, tol=1e-6, weight='weight')
-            
-            if color_encoding != 'degree':
-                min_centrality_all = min(min_centrality_all, min(centralities[timestamp].values()))
-                max_centrality_all = max(max_centrality_all, max(centralities[timestamp].values()))
-                
-            else:
+            if color_encoding == 'degree':
+                degrees = dict(G.degree())
+                centralities[timestamp] = degrees
                 max_degree_all = max(max_degree_all, max(degrees.values()))
                 min_degree_all = min(min_degree_all, min(degrees.values()))
+
+            if color_encoding != 'degree':
+                vals = list(centralities[timestamp].values())
+                if vals:
+                    min_centrality_all = min(min_centrality_all, min(vals))
+                    max_centrality_all = max(max_centrality_all, max(vals))
+        print("min_centrality_all:", min_centrality_all, "max_centrality_all:", max_centrality_all)
         
+
+    all_ids = {id for ts in ordering for id in ordering[ts]}
+    min_id, max_id = min(all_ids), max(all_ids)    
+    id_mapper = colorMapper.LinearHSVColorMapper(colormap=colormap, min_val=min_id, max_val=max_id)
+    print(f"id_mapper: colormap created with {colormap} and {min_id} to {max_id}")
+
+    binned_mapper = colorMapper.BinnedPercentileColorMapper(colormap=colormap, bins=10, min_val=0, max_val=1)
+
     for t_idx, timestamp in enumerate(timestamps):
         G = graphs_data[timestamp]
         node_order = ordering[timestamp]
@@ -119,13 +125,11 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colorma
         
         for y_idx, artist_id in enumerate(node_order):
             if color_encoding == 'id':
-                color = colorMapper.get_color_by_id(artist_id, num_artists)
+                color = id_mapper.get_color_by_value(artist_id)
             elif color_encoding == 'id2':
                 color = colorMapper.get_color_by_id2(artist_id, num_artists)
             elif color_encoding == 'id3':
                 color = colorMapper.get_color_by_id3(artist_id, num_artists)
-            elif color_encoding =='custom':
-                color = id_mapper.get_color_by_value(artist_id)
             elif color_encoding == 'betweenness_centrality':
                 color = binned_mapper.get_color_by_value(normalized_centralities[timestamp][artist_id])
             elif color_encoding == 'degree_centrality':
@@ -144,7 +148,6 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colorma
                 (x_start, y_start), pixel_size, pixel_size, color=color
             )
             ax.add_patch(rect)
-
             if labels:
                 ax.text(
                     x_start + pixel_size / 2, 
@@ -156,7 +159,6 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='custom', colorma
                     #fontsize=12
                     fontsize=pixel_size * 0.3
                 )
-
     ax.set_xlim(0, len(timestamps) * pixel_size)
     ax.set_ylim(0, num_artists * pixel_size)
     ax.set_xticks([pixel_size * i + pixel_size / 2 for i in range(len(timestamps))])
@@ -330,21 +332,22 @@ def draw_all_colored(graphs, title="", save=False, color_encoding='degree_centra
           from the `orderings` module to generate the visualizations.
     """
     fig, axes = plt.subplots(1, 8, figsize=(20, 6))
+    colormap = 'bwr'
     
     dfs_ordering = orderings.get_DFS_ordering(graphs)
-    draw_rug_from_graphs(graphs, dfs_ordering, ax=axes[0], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, dfs_ordering, ax=axes[0], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[0].set_title("DFS")
 
     bfs_ordering_weight = orderings.get_BFS_ordering(graphs, sorting_key='weight')
-    draw_rug_from_graphs(graphs, bfs_ordering_weight, ax=axes[1], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, bfs_ordering_weight, ax=axes[1], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[1].set_title("BFS: Weight")
 
     bfs_ordering_cn = orderings.get_BFS_ordering(graphs, sorting_key='common_neighbors')
-    draw_rug_from_graphs(graphs, bfs_ordering_cn, ax=axes[2], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, bfs_ordering_cn, ax=axes[2], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[2].set_title("BFS: Common Neighbors")
     
     #bfs_ordering = orderings.get_BFS_ordering(graphs, sorting_key='id')
-    #draw_rug_from_graphs(graphs, bfs_ordering, ax=axes[2], color_encoding=color_encoding, labels=labels)
+    #draw_rug_from_graphs(graphs, bfs_ordering, ax=axes[2], color_encoding=color_encoding, colormap=colormap, labels=labels)
     #axes[2].set_title("BFS: ID")
     
     #bfs_ordering = orderings.get_BFS_ordering(graphs, sorting_key='weight_desID')
@@ -352,23 +355,23 @@ def draw_all_colored(graphs, title="", save=False, color_encoding='degree_centra
     #axes[2].set_title("BFS:Weight_descending ID")
     
     priority_ordering = orderings.get_priority_bfs_ordering(graphs)
-    draw_rug_from_graphs(graphs, priority_ordering, ax=axes[3], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, priority_ordering, ax=axes[3], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[3].set_title("Priority")
 
     neighborhoods_ordering = orderings.get_community_ordering(graphs, "closeness")
-    draw_rug_from_graphs(graphs, neighborhoods_ordering, ax=axes[4], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, neighborhoods_ordering, ax=axes[4], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[4].set_title("Community")
     
     degree_ordering = orderings.get_degree_ordering(graphs)
-    draw_rug_from_graphs(graphs, degree_ordering, ax=axes[5], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, degree_ordering, ax=axes[5], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[5].set_title("Degree")
     
     centrality_ordering = orderings.get_centrality_ordering(graphs, centrality_measure='eigenvector')
-    draw_rug_from_graphs(graphs, centrality_ordering, ax=axes[6], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, centrality_ordering, ax=axes[6], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[6].set_title("Centrality: Eigenvector")
     
     centrality_ordering2 = orderings.get_centrality_ordering(graphs, centrality_measure='closeness')
-    draw_rug_from_graphs(graphs, centrality_ordering2, ax=axes[7], color_encoding=color_encoding, labels=labels)
+    draw_rug_from_graphs(graphs, centrality_ordering2, ax=axes[7], color_encoding=color_encoding, colormap=colormap, labels=labels)
     axes[7].set_title("Centrality: Closeness")
 
     if title != "":
