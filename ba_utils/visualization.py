@@ -25,7 +25,8 @@ def normalize(values_dict, min_val=None, max_val=None):
 
 def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='turbo',
                          labels=False, pixel_size=None, ax=None, 
-                         target_width_px=1600, target_height_px=900, dpi=100):
+                         target_width_px=1600, target_height_px=900, dpi=100,
+                         mapper_type='linear'):
     """
     Draws a rug plot from a series of graphs data, with dynamic layout that can fit the figure
     into a specified pixel window (e.g., 1600x900).
@@ -45,9 +46,7 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='t
     target_width_px (int, optional): Desired total width of the figure in pixels. Used only if pixel_size is None.
     target_height_px (int, optional): Desired total height of the figure in pixels. Used only if pixel_size is None.
     dpi (int, optional): Dots per inch for the figure. Used for converting pixel dimensions to inches. Default is 100.
-
-    Returns:
-    matplotlib.figure.Figure or None: The figure object if a new one was created, otherwise None.
+    mapper_type (str, optional): Type of color mapper to use. Options are 'linear' or 'binned'. Default is 'linear'.
     """
     fig = None
     centrality_encodings = ['betweenness_centrality', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality']
@@ -78,19 +77,18 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='t
     
     if color_encoding in centrality_encodings or color_encoding == 'degree':
         # Get minimum and maximum across all timestamps for global color_encoding
-        min_degree_all = num_artists
-        max_degree_all = 0
+        min_degree_all = float('inf')
+        max_degree_all = float('-inf')
         max_centrality_all = float('-inf')
         min_centrality_all = float('inf')
         centralities = {}
-        normalized_centralities = {}
         
         for timestamp in timestamps:
             G = graphs_data[timestamp]
             if color_encoding == 'betweenness_centrality':
                 centralities[timestamp] = nx.betweenness_centrality(G, normalized=True, weight='weight')
             elif color_encoding == 'degree_centrality':
-                centralities[timestamp] = nx.degree_centrality(G, weight='weight')
+                centralities[timestamp] = nx.degree_centrality(G)
             elif color_encoding == 'closeness_centrality':
                 centralities[timestamp] = nx.closeness_centrality(G, distance='weight')
             elif color_encoding == 'eigenvector_centrality':
@@ -107,39 +105,70 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='t
                     min_centrality_all = min(min_centrality_all, min(vals))
                     max_centrality_all = max(max_centrality_all, max(vals))
         print("min_centrality_all:", min_centrality_all, "max_centrality_all:", max_centrality_all)
-        
 
     all_ids = {id for ts in ordering for id in ordering[ts]}
     min_id, max_id = min(all_ids), max(all_ids)    
-    id_mapper = colorMapper.LinearHSVColorMapper(colormap=colormap, min_val=min_id, max_val=max_id)
-    print(f"id_mapper: colormap created with {colormap} and {min_id} to {max_id}")
+ 
 
-    binned_mapper = colorMapper.BinnedPercentileColorMapper(colormap=colormap, bins=10, min_val=0, max_val=1)
+    # Create the appropriate mapper based on mapper_type
+    if mapper_type == 'binned':
+        if color_encoding in centrality_encodings:
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap, 
+                bins=10,
+                min_val=min_centrality_all,
+                max_val=max_centrality_all
+            )
+        elif color_encoding == 'degree':
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap,
+                bins=10,
+                min_val=min_degree_all,
+                max_val=max_degree_all
+            )
+        else:  # id encoding
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap,
+                bins=10,
+                min_val=min_id,
+                max_val=max_id
+            )
+    else:  # linear mapper
+        if color_encoding in centrality_encodings:
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_centrality_all,
+                max_val=max_centrality_all
+            )
+        elif color_encoding == 'degree':
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_degree_all,
+                max_val=max_degree_all
+            )
+        else:  # id encoding
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_id,
+                max_val=max_id
+            )
 
     for t_idx, timestamp in enumerate(timestamps):
         G = graphs_data[timestamp]
         node_order = ordering[timestamp]
         
-        if color_encoding in centrality_encodings:
-            normalized_centralities[timestamp] = normalize(centralities[timestamp], min_centrality_all, max_centrality_all)
-        
         for y_idx, artist_id in enumerate(node_order):
             if color_encoding == 'id':
-                color = id_mapper.get_color_by_value(artist_id)
+                color = mapper.get_color_by_value(artist_id)
             elif color_encoding == 'id2':
                 color = colorMapper.get_color_by_id2(artist_id, num_artists)
             elif color_encoding == 'id3':
                 color = colorMapper.get_color_by_id3(artist_id, num_artists)
-            elif color_encoding == 'betweenness_centrality':
-                color = binned_mapper.get_color_by_value(normalized_centralities[timestamp][artist_id])
-            elif color_encoding == 'degree_centrality':
-                color = binned_mapper.get_color_by_value(normalized_centralities[timestamp][artist_id])
-            elif color_encoding == 'closeness_centrality':
-                color = binned_mapper.get_color_by_value(normalized_centralities[timestamp][artist_id])
-            elif color_encoding == 'eigenvector_centrality':
-                color = binned_mapper.get_color_by_value(normalized_centralities[timestamp][artist_id])
+            elif color_encoding in centrality_encodings:
+                color = mapper.get_color_by_value(centralities[timestamp][artist_id])
+                print("centrality for", artist_id, "at timestamp", timestamp, "is: ", centralities[timestamp][artist_id])
             elif color_encoding == 'degree':
-                color = binned_mapper.get_color_by_value(normalize({artist_id: G.degree(artist_id)}, min_degree_all, max_degree_all)[artist_id])
+                color = mapper.get_color_by_value(G.degree(artist_id))
                 
             # matplotlib rectangle
             x_start = t_idx * pixel_size
@@ -178,6 +207,147 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='t
     enable_hover(ax, fig, timestamps, ordering, pixel_size)
     
     return fig if ax is None else None
+
+def draw_rug_with_color_mapping(graphs_data, ordering, color_encoding='id', colormap='turbo',
+                                    labels=False, pixel_size=None, ax=None, 
+                                    target_width_px=1600, target_height_px=900, dpi=100,
+                                    mapper_type='linear'):
+    """
+    Draws a rug plot like `draw_rug_from_graphs` but ALSO returns a dict with node colors.
+    
+    Returns:
+        fig: matplotlib Figure (if ax was None)
+        color_mapping: dict mapping (timestamp, node_id) -> color
+    """
+    fig = None
+    centrality_encodings = ['betweenness_centrality', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality']
+    timestamps = sorted(graphs_data.keys())
+    num_artists = len(ordering[next(iter(ordering))])
+
+    color_mapping = {}
+
+    if pixel_size is None: 
+        pixel_size_x = target_width_px // len(timestamps)
+        pixel_size_y = target_height_px // num_artists
+        pixel_size = min(pixel_size_x, pixel_size_y)
+
+    fig_width = (len(timestamps) * pixel_size) / dpi
+    fig_height = (num_artists * pixel_size) / dpi
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+
+    if color_encoding in centrality_encodings or color_encoding == 'degree':
+        min_degree_all = float('inf')
+        max_degree_all = float('-inf')
+        max_centrality_all = float('-inf')
+        min_centrality_all = float('inf')
+        centralities = {}
+
+        for timestamp in timestamps:
+            G = graphs_data[timestamp]
+            if color_encoding == 'betweenness_centrality':
+                centralities[timestamp] = nx.betweenness_centrality(G, normalized=True, weight='weight')
+            elif color_encoding == 'degree_centrality':
+                centralities[timestamp] = nx.degree_centrality(G)
+            elif color_encoding == 'closeness_centrality':
+                centralities[timestamp] = nx.closeness_centrality(G, distance='weight')
+            elif color_encoding == 'eigenvector_centrality':
+                centralities[timestamp] = nx.eigenvector_centrality(G, max_iter=10000, tol=1e-6, weight='weight')
+            elif color_encoding == 'degree':
+                degrees = dict(G.degree())
+                centralities[timestamp] = degrees
+                max_degree_all = max(max_degree_all, max(degrees.values()))
+                min_degree_all = min(min_degree_all, min(degrees.values()))
+
+            if color_encoding != 'degree':
+                vals = list(centralities[timestamp].values())
+                if vals:
+                    min_centrality_all = min(min_centrality_all, min(vals))
+                    max_centrality_all = max(max_centrality_all, max(vals))
+
+    all_ids = {id for ts in ordering for id in ordering[ts]}
+    min_id, max_id = min(all_ids), max(all_ids)
+
+    if mapper_type == 'binned':
+        if color_encoding in centrality_encodings:
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap, bins=10,
+                min_val=min_centrality_all, max_val=max_centrality_all
+            )
+        elif color_encoding == 'degree':
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap, bins=10,
+                min_val=min_degree_all, max_val=max_degree_all
+            )
+        else:  # id encoding
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap, bins=10,
+                min_val=min_id, max_val=max_id
+            )
+    else:  # linear mapper
+        if color_encoding in centrality_encodings:
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_centrality_all, max_val=max_centrality_all
+            )
+        elif color_encoding == 'degree':
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_degree_all, max_val=max_degree_all
+            )
+        else:  # id encoding
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_id, max_val=max_id
+            )
+
+    for t_idx, timestamp in enumerate(timestamps):
+        G = graphs_data[timestamp]
+        node_order = ordering[timestamp]
+
+        for y_idx, artist_id in enumerate(node_order):
+            if color_encoding == 'id':
+                color = mapper.get_color_by_value(artist_id)
+            elif color_encoding == 'id2':
+                color = colorMapper.get_color_by_id2(artist_id, num_artists)
+            elif color_encoding == 'id3':
+                color = colorMapper.get_color_by_id3(artist_id, num_artists)
+            elif color_encoding in centrality_encodings:
+                color = mapper.get_color_by_value(centralities[timestamp][artist_id])
+            elif color_encoding == 'degree':
+                color = mapper.get_color_by_value(G.degree(artist_id))
+
+            color_mapping[(timestamp, artist_id)] = color  # <-- Save the color assignment!
+
+            # Draw the rectangle
+            x_start = t_idx * pixel_size
+            y_start = y_idx * pixel_size
+            rect = plt.Rectangle((x_start, y_start), pixel_size, pixel_size, color=color)
+            ax.add_patch(rect)
+
+            if labels:
+                ax.text(
+                    x_start + pixel_size/2, y_start + pixel_size/2,
+                    str(artist_id),
+                    color='white', ha='center', va='center',
+                    fontsize=pixel_size * 0.3
+                )
+
+    ax.set_xlim(0, len(timestamps) * pixel_size)
+    ax.set_ylim(0, num_artists * pixel_size)
+    ax.set_xticks([pixel_size * i + pixel_size / 2 for i in range(len(timestamps))])
+    ax.set_xticklabels(timestamps, rotation=45)
+    ax.set_yticks([])
+    ax.set_yticklabels([])
+    ax.invert_yaxis()
+    ax.axis('off')
+
+    if ax is None:
+        plt.show()
+
+    return (fig if fig is not None else ax.get_figure()), color_mapping
+
 
 # Older versions
 def draw_rug_plot_with_ids(data, ordering, pixel_size=40, ax=None):
