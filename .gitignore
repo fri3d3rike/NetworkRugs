@@ -7,9 +7,11 @@ plt_out/
 *.pkl
 *.parquet
 *.png
-
+*.xml
+*.iml
 
 .ipynb_checkpoints
 __pycache__/
 
 data/DynamicNetworks
+literature/MotionRugsPreprint.pdf

@@ -12,7 +12,7 @@ from ba_utils.visualization import draw_rug_from_graphs
 
 
 # --- Drawing Function ---
-def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='turbo', labels=False, pixel_size=6, order="", ax=None, start_nodes=None, init_start=False):
+def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='turbo', labels=False, pixel_size=6, order="", ax=None, start_nodes=None, init_start=False, mapper_type='linear'):
     """
     Draws a single NetworkRug with a specific color encoding and pixel size.
     Adjusts figure size dynamically to support scalability in node/time dimensions.
@@ -51,6 +51,7 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='tur
             colormap= colormap,
             labels=labels,
             pixel_size=pixel_size,
+            mapper_type=mapper_type,
             ax=ax
         )
     else:   
@@ -61,6 +62,7 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='tur
             colormap= colormap,
             labels=labels,
             pixel_size=pixel_size,
+            mapper_type=mapper_type,
             ax=ax
         )
     return fig
@@ -111,6 +113,7 @@ def launch_tkinter_ui(graphs):
             color_encoding=color_var.get(),
             labels=label_var.get(),
             pixel_size=pixel_var.get(),
+            mapper_type=mapper_var.get(),
             ax=ax
         )
         for widget in canvas_frame.winfo_children():
@@ -129,6 +132,7 @@ def launch_tkinter_ui(graphs):
 
     # --- Variables ---
     color_var = tk.StringVar(value='closeness_centrality')
+    mapper_var = tk.StringVar(value='linear')  # New variable for mapper type
     label_var = tk.BooleanVar()
     pixel_var = tk.IntVar(value=6)
 
@@ -142,8 +146,13 @@ def launch_tkinter_ui(graphs):
         'id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality'])
     color_box.grid(row=0, column=1, padx=5)
 
+    # --- Mapper Type Dropdown ---
+    ttk.Label(control_frame, text="Color Mapping:").grid(row=0, column=2, sticky='e', padx=5)
+    mapper_box = ttk.Combobox(control_frame, textvariable=mapper_var, values=['linear', 'binned'])
+    mapper_box.grid(row=0, column=3, padx=5)
+
     # --- Label Checkbox ---
-    ttk.Checkbutton(control_frame, text="Show Labels", variable=label_var).grid(row=0, column=2, padx=5)
+    ttk.Checkbutton(control_frame, text="Show Labels", variable=label_var).grid(row=0, column=4, padx=5)
 
     # --- Pixel Size Slider + Label ---
     ttk.Label(control_frame, text="Pixel Size:").grid(row=1, column=0, sticky='e', padx=5)
