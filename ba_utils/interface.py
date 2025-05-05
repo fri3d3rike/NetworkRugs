@@ -1,0 +1,662 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+from datetime import datetime
+import os
+
+import ba_utils.orderings as orderings
+import ba_utils.color as colorMapper
+import ba_utils.data_generator as dg
+import ba_utils.visualization as visualization
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+import tkinter as tk
+from tkinter import ttk
+
+
+
+
+
+def draw_rug_with_color_mapping(graphs_data, ordering, color_encoding='id', colormap='turbo',
+                                    labels=False, pixel_size=None, ax=None, 
+                                    target_width_px=1600, target_height_px=900, dpi=100,
+                                    mapper_type='linear'):
+    """
+    Draws a rug plot like `draw_rug_from_graphs` but ALSO returns a dict with node colors.
+    
+    Returns:
+        fig: matplotlib Figure (if ax was None)
+        color_mapping: dict mapping (timestamp, node_id) -> color
+    """
+    fig = None
+    centrality_encodings = ['betweenness_centrality', 'degree_centrality', 'closeness_centrality', 'eigenvector_centrality']
+    timestamps = sorted(graphs_data.keys())
+    num_artists = len(ordering[next(iter(ordering))])
+
+    color_mapping = {}
+
+    if pixel_size is None: 
+        pixel_size_x = target_width_px // len(timestamps)
+        pixel_size_y = target_height_px // num_artists
+        pixel_size = min(pixel_size_x, pixel_size_y)
+
+    fig_width = (len(timestamps) * pixel_size) / dpi
+    fig_height = (num_artists * pixel_size) / dpi
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+
+    if color_encoding in centrality_encodings or color_encoding == 'degree':
+        min_degree_all = float('inf')
+        max_degree_all = float('-inf')
+        max_centrality_all = float('-inf')
+        min_centrality_all = float('inf')
+        centralities = {}
+
+        for timestamp in timestamps:
+            G = graphs_data[timestamp]
+            if color_encoding == 'betweenness_centrality':
+                centralities[timestamp] = nx.betweenness_centrality(G, normalized=True, weight='weight')
+            elif color_encoding == 'degree_centrality':
+                centralities[timestamp] = nx.degree_centrality(G)
+            elif color_encoding == 'closeness_centrality':
+                centralities[timestamp] = nx.closeness_centrality(G, distance='weight')
+            elif color_encoding == 'eigenvector_centrality':
+                centralities[timestamp] = nx.eigenvector_centrality(G, max_iter=10000, tol=1e-6, weight='weight')
+            elif color_encoding == 'degree':
+                degrees = dict(G.degree())
+                centralities[timestamp] = degrees
+                max_degree_all = max(max_degree_all, max(degrees.values()))
+                min_degree_all = min(min_degree_all, min(degrees.values()))
+
+            if color_encoding != 'degree':
+                vals = list(centralities[timestamp].values())
+                if vals:
+                    min_centrality_all = min(min_centrality_all, min(vals))
+                    max_centrality_all = max(max_centrality_all, max(vals))
+
+    all_ids = {id for ts in ordering for id in ordering[ts]}
+    min_id, max_id = min(all_ids), max(all_ids)
+
+    if mapper_type == 'binned':
+        if color_encoding in centrality_encodings:
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap, bins=10,
+                min_val=min_centrality_all, max_val=max_centrality_all
+            )
+        elif color_encoding == 'degree':
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap, bins=10,
+                min_val=min_degree_all, max_val=max_degree_all
+            )
+        else:  # id encoding
+            mapper = colorMapper.BinnedPercentileColorMapper(
+                colormap=colormap, bins=10,
+                min_val=min_id, max_val=max_id
+            )
+    else:  # linear mapper
+        if color_encoding in centrality_encodings:
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_centrality_all, max_val=max_centrality_all
+            )
+        elif color_encoding == 'degree':
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_degree_all, max_val=max_degree_all
+            )
+        else:  # id encoding
+            mapper = colorMapper.LinearHSVColorMapper(
+                colormap=colormap,
+                min_val=min_id, max_val=max_id
+            )
+
+    for t_idx, timestamp in enumerate(timestamps):
+        G = graphs_data[timestamp]
+        node_order = ordering[timestamp]
+
+        for y_idx, artist_id in enumerate(node_order):
+            if color_encoding == 'id':
+                color = mapper.get_color_by_value(artist_id)
+            elif color_encoding == 'id2':
+                color = colorMapper.get_color_by_id2(artist_id, num_artists)
+            elif color_encoding == 'id3':
+                color = colorMapper.get_color_by_id3(artist_id, num_artists)
+            elif color_encoding in centrality_encodings:
+                color = mapper.get_color_by_value(centralities[timestamp][artist_id])
+            elif color_encoding == 'degree':
+                color = mapper.get_color_by_value(G.degree(artist_id))
+
+            color_mapping[(timestamp, artist_id)] = color  # <-- Save the color assignment!
+
+            # Draw the rectangle
+            x_start = t_idx * pixel_size
+            y_start = y_idx * pixel_size
+            rect = plt.Rectangle((x_start, y_start), pixel_size, pixel_size, color=color)
+            ax.add_patch(rect)
+
+            if labels:
+                ax.text(
+                    x_start + pixel_size/2, y_start + pixel_size/2,
+                    str(artist_id),
+                    color='white', ha='center', va='center',
+                    fontsize=pixel_size * 0.3
+                )
+
+    ax.set_xlim(0, len(timestamps) * pixel_size)
+    ax.set_ylim(0, num_artists * pixel_size)
+    ax.set_xticks([pixel_size * i + pixel_size / 2 for i in range(len(timestamps))])
+    ax.set_xticklabels(timestamps, rotation=45)
+    ax.set_yticks([])
+    ax.set_yticklabels([])
+    ax.invert_yaxis()
+    ax.axis('off')
+
+    if ax is None:
+        plt.show()
+
+    if fig is None and ax is not None:
+        fig = ax.get_figure()
+
+    return (fig if fig is not None else ax.get_figure()), color_mapping
+
+
+
+
+# --- Global hover state ---
+hover_timer = None
+last_hover_coords = (None, None)
+hover_preview_canvas = None
+hover_delay_ms = 500  # 1 second to trigger preview
+click_popups = []
+
+def enable_hover(ax, fig, graphs_data, ordering, color_mapping, pixel_size=40):
+    """
+    Enables hover previews over a matplotlib Axes inside a Tkinter window.
+    When hovering over a pixel, after a delay, a small preview of the graph appears.
+    """
+
+    global hover_timer, last_hover_coords, hover_preview_canvas
+
+    canvas = fig.canvas
+    parent_widget = canvas.get_tk_widget().master  # The Tkinter frame
+
+    def open_hover_preview(timestamp, node_id, x_canvas, y_canvas):
+        global hover_preview_canvas
+
+        # Remove existing preview
+        if hover_preview_canvas:
+            hover_preview_canvas.get_tk_widget().destroy()
+            hover_preview_canvas = None
+
+        # Create mini figure
+        fig_preview = plt.Figure(figsize=(2, 2))
+        ax_preview = fig_preview.add_subplot(111)
+        G = graphs_data[timestamp]
+        pos = nx.spring_layout(G)
+
+        node_colors = [color_mapping.get((timestamp, n), 'C0') for n in G.nodes()]
+        nx.draw(G, pos, with_labels=False, node_size=50, font_size=4, node_color=node_colors, ax=ax_preview)
+        ax_preview.axis('off')
+        ax_preview.set_title(f"t={timestamp}", fontsize=8)
+
+        hover_preview_canvas = FigureCanvasTkAgg(fig_preview, master=parent_widget)
+        hover_preview_canvas.draw()
+        widget = hover_preview_canvas.get_tk_widget()
+        widget.place(x=x_canvas, y=y_canvas)
+
+    def on_hover(event):
+        global hover_timer, last_hover_coords, hover_preview_canvas
+
+        if event.inaxes is None or not hasattr(event, 'xdata') or not hasattr(event, 'ydata'):
+            return
+
+        x, y = int(event.xdata), int(event.ydata)
+        canvas_x = event.guiEvent.x
+        canvas_y = event.guiEvent.y
+
+        def trigger_hover_preview():
+            try:
+                t_idx = x // pixel_size
+                y_idx = y // pixel_size
+
+                timestamps = sorted(graphs_data.keys())
+                if t_idx >= len(timestamps):
+                    return
+                timestamp = timestamps[t_idx]
+                node_ordering = ordering[timestamp]
+                if y_idx >= len(node_ordering):
+                    return
+                node_id = node_ordering[y_idx]
+
+                open_hover_preview(timestamp, node_id, canvas_x, canvas_y)
+
+            except Exception as e:
+                print("Error during hover preview:", e)
+
+        # Movement cancels preview
+        last_x, last_y = last_hover_coords
+        if last_x is not None and last_y is not None:
+            move_distance = ((x - last_x) ** 2 + (y - last_y) ** 2) ** 0.5
+            if move_distance > 5:
+                if hover_timer:
+                    parent_widget.after_cancel(hover_timer)
+                hover_timer = None
+                if hover_preview_canvas:
+                    widget = hover_preview_canvas.get_tk_widget()
+                    if widget.winfo_exists():
+                        try:
+                            widget.destroy()
+                        except tk.TclError:
+                            pass
+                    hover_preview_canvas = None
+
+        last_hover_coords = (x, y)
+
+        if hover_timer is None:
+            hover_timer = parent_widget.after(hover_delay_ms, trigger_hover_preview)
+
+    def on_leave(event):
+        global hover_preview_canvas, hover_timer
+        # Cancel hover timer if running
+        if hover_timer:
+            parent_widget.after_cancel(hover_timer)
+            hover_timer = None
+        # Destroy the preview if it exists
+        if hover_preview_canvas:
+            widget = hover_preview_canvas.get_tk_widget()
+            if widget.winfo_exists():
+                try:
+                    widget.destroy()
+                except tk.TclError:
+                    pass
+            hover_preview_canvas = None
+
+    # --- Connect ---
+    canvas.mpl_connect('motion_notify_event', on_hover)
+    canvas.mpl_connect('figure_leave_event', on_leave)
+
+
+
+def open_popup(timestamp, node_id, graphs_data, color_mapping):
+    fig_graph = plt.Figure(figsize=(4, 4))
+    ax_graph = fig_graph.add_subplot(111)
+    G = graphs_data[timestamp]
+    pos = nx.spring_layout(G)
+
+    node_colors = [color_mapping.get((timestamp, n), 'C0') for n in G.nodes()]
+    nx.draw(G, pos, with_labels=True, node_size=200, font_size=8, font_color='white', node_color=node_colors, ax=ax_graph)
+    ax_graph.set_title(f"Graph at t={timestamp}")
+
+    popup = tk.Toplevel()
+    popup.title(f"Graph at t={timestamp}")
+    canvas_graph = FigureCanvasTkAgg(fig_graph, master=popup)
+    canvas_graph.draw()
+    canvas_graph.get_tk_widget().pack(fill='both', expand=True)
+    click_popups.append(popup)
+
+def close_all_popups():
+    global click_popups
+    for popup in click_popups:
+        try:
+            popup.destroy()
+        except Exception:
+            pass
+    click_popups = []  
+
+def enable_click(ax, fig, graphs_data, ordering, color_mapping, pixel_size=40):
+    canvas = fig.canvas
+
+    def on_click(event):
+        if event.inaxes is None or not hasattr(event, 'xdata') or not hasattr(event, 'ydata'):
+            return
+
+        x, y = int(event.xdata), int(event.ydata)
+
+        try:
+            t_idx = x // pixel_size
+            y_idx = y // pixel_size
+
+            timestamps = sorted(graphs_data.keys())
+            if t_idx >= len(timestamps):
+                return
+            timestamp = timestamps[t_idx]
+            node_ordering = ordering[timestamp]
+            if y_idx >= len(node_ordering):
+                return
+            node_id = node_ordering[y_idx]
+
+            open_popup(timestamp, node_id, graphs_data, color_mapping)
+
+        except Exception as e:
+            print("Error during click:", e)
+
+    canvas.mpl_connect('button_press_event', on_click)
+
+
+# Global graph data
+graphs_data = {}
+
+def open_rug_window():
+    if not graphs_data:
+        print("No graphs generated yet.")
+        return
+
+    rug_window = tk.Toplevel()
+    rug_window.title("NetworkRug Visualizer")
+    rug_window.geometry("1600x900")
+
+    def on_rug_window_close():
+        close_all_popups()
+        rug_window.destroy()
+    rug_window.protocol("WM_DELETE_WINDOW", on_rug_window_close)
+
+    color_options = ['id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
+    ordering_options = ['priority', 'dfs', 'bfs']
+    start_node_options = ['degree', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality', 'id']
+    start_node_mode_options = ['highest', 'lowest']
+    colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
+    colormap_type_options = ['linear', 'binned']
+
+    color_var = tk.StringVar(value='id')
+    order_var = tk.StringVar(value='priority')
+    start_node_var = tk.StringVar(value='id')
+    start_node_mode_var = tk.StringVar(value='lowest')
+    label_var = tk.BooleanVar()
+    mapper_type_var = tk.StringVar(value='linear')
+    colormap_var = tk.StringVar(value='turbo')
+
+    control_frame = ttk.Frame(rug_window)
+    control_frame.pack(side='top', fill='x', pady=10)
+
+    ttk.Label(control_frame, text="Color Encoding").grid(row=0, column=0, padx=5)
+    ttk.Combobox(control_frame, textvariable=color_var, values=color_options).grid(row=0, column=1, padx=5)
+
+    ttk.Label(control_frame, text="Colormap").grid(row=1, column=0, padx=5)
+    ttk.Combobox(control_frame, textvariable=colormap_var, values=colormap_options).grid(row=1, column=1, padx=5)
+
+    # --- Mapper Type Dropdown ---
+    ttk.Label(control_frame, text="Color Mapping Type:").grid(row=0, column=2, sticky='e', padx=5)
+    ttk.Combobox(control_frame, textvariable=mapper_type_var, values=colormap_type_options).grid(row=0, column=3, padx=5)
+
+    ttk.Label(control_frame, text="Ordering").grid(row=0, column=4, padx=5)
+    ttk.Combobox(control_frame, textvariable=order_var, values=ordering_options).grid(row=0, column=5, padx=5)
+
+    # --- Start Node Dropdown ---
+    ttk.Label(control_frame, text="Start Node").grid(row=0, column=6, padx=5)
+    ttk.Combobox(control_frame, textvariable=start_node_var, values=start_node_options).grid(row=0, column=7, padx=5)
+
+    ttk.Label(control_frame, text="Start Node Mode").grid(row=1, column=6, padx=5)
+    ttk.Combobox(control_frame, textvariable=start_node_mode_var, values=start_node_mode_options).grid(row=1, column=7, padx=5)
+
+    ttk.Checkbutton(control_frame, text="Show Labels", variable=label_var).grid(row=1, column=3, padx=5)
+
+    rug_canvas = ttk.Frame(rug_window)
+    rug_canvas.pack(fill='both', expand=True)
+
+    def render_rug():
+        fig = plt.Figure()
+        ax = fig.add_subplot(111)
+
+        if start_node_var.get() == 'id' and start_node_mode_var.get() == 'lowest':
+            start_nodes = None
+        elif start_node_var.get() == 'id' and start_node_mode_var.get() == 'highest':
+            start_nodes = {timestamp: max(graphs_data[timestamp].nodes()) for timestamp in graphs_data.keys()}
+        else:
+            start_nodes = orderings.get_start_node(graphs_data, start_node_var.get(), start_node_mode_var.get())
+
+        # --- Select ordering ---
+        if order_var.get() == "priority":
+            ordering = orderings.get_priority_bfs_ordering(graphs_data, start_nodes)
+            print("Using priority BFS ordering")
+        elif order_var.get() == "bfs":
+            ordering = orderings.get_BFS_ordering(graphs_data, start_nodes, sorting_key='weight')
+            print("Using BFS ordering")
+        elif order_var.get() == "dfs":
+            ordering = orderings.get_DFS_ordering(graphs_data, start_nodes)
+            print("Using DFS ordering")
+        else:
+            ordering = orderings.get_priority_bfs_ordering(graphs_data, start_nodes)
+            print("Using default priority BFS ordering")
+
+        # --- Draw NetworkRug ---
+        fig, color_mapping = visualization.draw_rug_with_color_mapping(
+            graphs_data,
+            ordering=ordering,
+            color_encoding=color_var.get(),
+            colormap=colormap_var.get(),
+            mapper_type=mapper_type_var.get(),
+            labels=label_var.get(),
+            pixel_size=40,  # fixed for click mapping
+            ax=ax
+        )
+
+        # --- Setup Matplotlib Canvas ---
+        for widget in rug_canvas.winfo_children():
+            widget.destroy()
+
+        canvas = FigureCanvasTkAgg(fig, master=rug_canvas)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill='both', expand=True)
+
+        enable_hover(ax, fig, graphs_data, ordering, color_mapping, pixel_size=40)
+        enable_click(ax, fig, graphs_data, ordering, color_mapping, pixel_size=40)
+        return fig
+
+    render_rug()
+    ttk.Button(control_frame, text="Render Rug", command=render_rug).grid(row=2, column=0, columnspan=4, pady=10)
+
+    def save_figure():
+        fig = render_rug()
+        if fig:
+            timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+            config_str = (
+                f"color_{color_var.get()}__"
+                f"order_{order_var.get()}__"
+                f"cmap_{colormap_var.get()}__"
+                f"num_nodes_{len(next(iter(graphs_data.values())))}__"
+                f"time_steps_{len(graphs_data)}__"
+            )
+            filename = f"networkrug__{config_str}__{timestamp_str}.png"
+            os.makedirs("outputs", exist_ok=True)
+            full_path = os.path.join("outputs", filename)
+
+            fig.savefig(full_path, dpi=300, bbox_inches='tight')
+            print(f"Figure saved as {full_path}")
+
+    ttk.Button(control_frame, text="Save as PNG", command=save_figure).grid(row=2, column=4, columnspan=2, pady=10)
+
+
+def start_gui():
+    global graphs_data
+    root = tk.Tk()
+    root.title("NetworkRug Generator")
+    root.geometry("800x1600")
+
+    left_frame = ttk.Frame(root)
+    for i in range(4):  # assuming you use up to column 3
+        left_frame.columnconfigure(i, weight=1)
+    left_frame.pack(fill='both', expand=True)
+
+    num_nodes_var = tk.IntVar(value=30)
+    num_steps_var = tk.IntVar(value=100)
+    intra_strength_var = tk.DoubleVar(value=0.8)
+    inter_strength_var = tk.DoubleVar(value=0.1)
+    mode_var = tk.StringVar(value='timed')
+
+    ttk.Label(left_frame, text="Num Nodes").grid(row=0, column=0, sticky='e')
+    ttk.Entry(left_frame, textvariable=num_nodes_var).grid(row=0, column=1)
+    ttk.Label(left_frame, text="Timesteps").grid(row=1, column=0, sticky='e')
+    ttk.Entry(left_frame, textvariable=num_steps_var).grid(row=1, column=1)
+    ttk.Label(left_frame, text="Intra Community Strength").grid(row=2, column=0, sticky='e')
+    ttk.Entry(left_frame, textvariable=intra_strength_var).grid(row=2, column=1)
+    ttk.Label(left_frame, text="Inter Community Strength").grid(row=3, column=0, sticky='e')
+    ttk.Entry(left_frame, textvariable=inter_strength_var).grid(row=3, column=1)
+
+    ttk.Label(left_frame, text="Generation Mode").grid(row=4, column=0)
+    mode_dropdown = ttk.Combobox(left_frame, textvariable=mode_var, values=["timed", "proportioned"])
+    mode_dropdown.grid(row=4, column=1)
+
+    dynamic_widgets_frame = ttk.Frame(left_frame)
+    dynamic_widgets_frame.grid(row=0, column=2, rowspan=5, sticky='nw', padx=10, pady=5)
+    input_state_var = tk.StringVar(value="{0:25,1:25,2:50}")
+    final_state_var = tk.StringVar(value="{0:10,1:50,2:40}")
+    initial_groups_var = tk.StringVar(value="1")
+    init_mode_var = tk.StringVar(value="block")
+    split_events_var = tk.StringVar(value="{10: [(0, 5)]}")
+    merge_events_var = tk.StringVar(value="{}")
+    state_input_var = tk.StringVar(value="20={0:100,1:0,2:0}; 40={0:70,1:20,2:10}")
+
+    def create_tooltip(widget, text):
+        tooltip = None
+        def show_tooltip(event):
+            nonlocal tooltip
+            x, y, _, _ = widget.bbox("insert")
+            x += widget.winfo_rootx() + 25
+            y += widget.winfo_rooty() + 25
+            tooltip = tk.Toplevel(widget)
+            tooltip.wm_overrideredirect(True)
+            tooltip.wm_geometry(f"+{x}+{y}")
+            label = ttk.Label(tooltip, text=text, justify='left',
+                             background="#ffffe0", relief='solid', borderwidth=1,
+                             padding=(5, 2, 5, 2))
+            label.pack()
+        def hide_tooltip(event):
+            nonlocal tooltip
+            if tooltip:
+                tooltip.destroy()
+                tooltip = None
+        widget.bind('<Enter>', show_tooltip)
+        widget.bind('<Leave>', hide_tooltip)
+
+    def update_dynamic_inputs(*args):
+        for widget in dynamic_widgets_frame.winfo_children():
+            widget.destroy()
+
+        if mode_var.get() == "proportioned":
+            ttk.Label(dynamic_widgets_frame, text="Initial State").grid(row=0, column=0, sticky='e')
+            ttk.Entry(dynamic_widgets_frame, textvariable=input_state_var, width=30).grid(row=0, column=1)
+
+            ttk.Label(dynamic_widgets_frame, text="Intermediate States").grid(row=1, column=0, sticky='e')
+            ttk.Entry(dynamic_widgets_frame, textvariable=state_input_var, width=30).grid(row=1, column=1, columnspan=2)
+
+            ttk.Label(dynamic_widgets_frame, text="Final State").grid(row=2, column=0, sticky='e')
+            ttk.Entry(dynamic_widgets_frame, textvariable=final_state_var, width=30).grid(row=2, column=1)
+
+
+        else:
+            ttk.Label(dynamic_widgets_frame, text="Initial Groups").grid(row=0, column=0, sticky='e')
+            ttk.Entry(dynamic_widgets_frame, textvariable=initial_groups_var).grid(row=0, column=1)
+            ttk.Label(dynamic_widgets_frame, text="Init Mode").grid(row=1, column=0, sticky='e')
+            ttk.Combobox(dynamic_widgets_frame, textvariable=init_mode_var, values=["block", "random"]).grid(row=1, column=1)
+            
+            # Split Events with tooltip
+            split_label = ttk.Label(dynamic_widgets_frame, text="Split Events")
+            split_label.grid(row=2, column=0, sticky='e')
+            split_entry = ttk.Entry(dynamic_widgets_frame, textvariable=split_events_var)
+            split_entry.grid(row=2, column=1)
+            split_help = ttk.Label(dynamic_widgets_frame, text="?")
+            split_help.grid(row=2, column=2)
+            create_tooltip(split_help, "Format: {timestamp: [(group to split, duration).]..}\nExample: {10: [(0, 50)]} means at t=10, group 0 splits for 50 timesteps")
+            
+            # Merge Events with tooltip
+            merge_label = ttk.Label(dynamic_widgets_frame, text="Merge Events")
+            merge_label.grid(row=3, column=0, sticky='e')
+            merge_entry = ttk.Entry(dynamic_widgets_frame, textvariable=merge_events_var)
+            merge_entry.grid(row=3, column=1)
+            merge_help = ttk.Label(dynamic_widgets_frame, text="?")
+            merge_help.grid(row=3, column=2)
+            create_tooltip(merge_help, "Format: {timestep: [(source, destination, duration).]..}\nExample: {20: [(1, 2, 50)]} means at t=20, group 1 merges into group 2 for 50 timesteps")
+
+    mode_dropdown.bind("<<ComboboxSelected>>", update_dynamic_inputs)
+    update_dynamic_inputs()
+
+    left_canvas = ttk.Frame(left_frame)
+    left_canvas.grid(row=9, column=0, columnspan=4, sticky='nsew', pady=10)
+
+    def visualize_graph_grid():
+        for widget in left_canvas.winfo_children():
+            widget.destroy()
+        left_canvas.update_idletasks()  # ensure geometry is calculated
+        width = left_canvas.winfo_width()
+        height = left_canvas.winfo_height()
+
+        # Fallback size if dimensions are 0 (e.g., on first call)
+        if width < 100 or height < 100:
+            width, height = 800, 600
+
+        fig = plt.Figure(figsize=(width / 100, height / 100))
+        selected_keys = sorted(graphs_data.keys())
+        step = max(1, len(selected_keys) // 20)
+        show_keys = selected_keys[::step]
+
+        cols = 5
+        rows = (len(show_keys) + cols - 1) // cols
+        fig.clf()
+
+        for i, t in enumerate(show_keys):
+            sub_ax = fig.add_subplot(rows, cols, i + 1)
+            pos = nx.spring_layout(graphs_data[t])
+            nx.draw(graphs_data[t], pos, with_labels=True, node_size=150, font_size=6, font_color='white', ax=sub_ax)
+            sub_ax.set_title(f"t={t}", fontsize=8)
+
+        canvas = FigureCanvasTkAgg(fig, master=left_canvas)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill='both', expand=True)
+        print("Mini graphs rendered with canvas size:", width, "x", height)
+
+    def generate_and_visualize():
+        global graphs_data
+        try:
+            if mode_var.get() == "proportioned":
+                '''graphs_data, _, _ = dg.generate_proportional_transitionOLD(
+                    num_nodes=num_nodes_var.get(),
+                    num_steps=num_steps_var.get(),
+                    initial_state=init_state_var.get(),
+                    final_state=final_state_var.get(),
+                    intra_community_strength=intra_strength_var.get(),
+                    inter_community_strength=inter_strength_var.get()
+                )
+                '''
+
+                init_state = eval(input_state_var.get())
+                final_state = eval(final_state_var.get())
+                # Get the states string, pass it directly if not empty
+                states_str = state_input_var.get().strip()
+                states_input = states_str if states_str else None
+
+                graphs_data, _, _ = dg.generate_proportional_transition(
+                    num_nodes=num_nodes_var.get(),
+                    num_steps=num_steps_var.get(),
+                    initial_state=init_state,
+                    final_state=final_state,
+                    states=states_input, # Pass string or None
+                    intra_community_strength=intra_strength_var.get(),
+                    inter_community_strength=inter_strength_var.get()
+                )
+
+
+            else:
+                split_ev = eval(split_events_var.get() or "{}")
+                merge_ev = eval(merge_events_var.get() or "{}")
+                graphs_data, _, _ = dg.generate_dynamic_graphs(
+                    num_nodes=num_nodes_var.get(),
+                    num_steps=num_steps_var.get(),
+                    initial_groups=int(initial_groups_var.get()),
+                    intra_community_strength=intra_strength_var.get(),
+                    inter_community_strength=inter_strength_var.get(),
+                    split_events=split_ev,
+                    merge_events=merge_ev,
+                    init_mode=init_mode_var.get()
+                )
+            visualize_graph_grid()
+            #open_rug_window()
+        except Exception as e:
+            print("Error generating graphs:", e)
+
+    ttk.Button(left_frame, text="Generate & Show Graphs", command=generate_and_visualize).grid(row=8, column=0, columnspan=2, pady=10)
+    ttk.Button(left_frame, text="Open NetworkRug Viewer", command=open_rug_window).grid(row=8, column=2, columnspan=2, pady=1)
+    #ttk.Button(left_frame, text="Open NetworkRug Viewer", command=generate_and_open).grid(row=8, column=2, columnspan=2, pady=1)
+
+    root.mainloop()

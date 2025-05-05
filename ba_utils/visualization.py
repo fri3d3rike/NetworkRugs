@@ -10,6 +10,9 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 from io import BytesIO
 from PIL import Image
+import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import time
 
 # run this command to run
 # python -m ba_utils.visualization
@@ -104,7 +107,6 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='t
                 if vals:
                     min_centrality_all = min(min_centrality_all, min(vals))
                     max_centrality_all = max(max_centrality_all, max(vals))
-        print("min_centrality_all:", min_centrality_all, "max_centrality_all:", max_centrality_all)
 
     all_ids = {id for ts in ordering for id in ordering[ts]}
     min_id, max_id = min(all_ids), max(all_ids)    
@@ -166,7 +168,6 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='t
                 color = colorMapper.get_color_by_id3(artist_id, num_artists)
             elif color_encoding in centrality_encodings:
                 color = mapper.get_color_by_value(centralities[timestamp][artist_id])
-                print("centrality for", artist_id, "at timestamp", timestamp, "is: ", centralities[timestamp][artist_id])
             elif color_encoding == 'degree':
                 color = mapper.get_color_by_value(G.degree(artist_id))
                 
@@ -345,6 +346,11 @@ def draw_rug_with_color_mapping(graphs_data, ordering, color_encoding='id', colo
 
     if ax is None:
         plt.show()
+
+    if fig is None and ax is not None:
+        fig = ax.get_figure()
+
+    enable_hover(ax, fig, timestamps, ordering, pixel_size)
 
     return (fig if fig is not None else ax.get_figure()), color_mapping
 
@@ -708,8 +714,7 @@ def visualize_adjacency_matrix(adjacency_matrix, node_order_in_matrix, title="Re
     plt.grid(False)
     plt.show()
     
-    
-    
+
 #### Interaction with Tkinter GUI
 
 def enable_hover(ax, fig, timestamps, ordering, pixel_size):
@@ -749,3 +754,5 @@ def enable_hover(ax, fig, timestamps, ordering, pixel_size):
         fig.canvas.draw_idle()
 
     fig.canvas.mpl_connect("motion_notify_event", motion)
+
+    

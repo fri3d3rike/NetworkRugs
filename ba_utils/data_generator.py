@@ -1,11 +1,71 @@
 import networkx as nx
 import random
 import math
+import ast # For safe literal evaluation
+
+
+# --- Helper Functions ---
+
+def _percentages_to_counts(state_percentages, all_groups, num_nodes):
+    """Converts state percentages to node counts, distributing remainders."""
+    counts = {g: (state_percentages.get(g, 0) / 100) * num_nodes for g in all_groups}
+    rounded = {g: int(math.floor(counts[g])) for g in counts}
+    remaining = num_nodes - sum(rounded.values())
+    # Distribute remaining nodes to the groups with the largest fractional parts
+    remainder_groups = sorted(all_groups, key=lambda g: counts[g] - rounded[g], reverse=True)
+    for g in remainder_groups:
+        if remaining <= 0:
+            break
+        rounded[g] += 1
+        remaining -= 1
+    return rounded
+
+def _create_graph(nodes, community_assignment, intra_p, inter_p, connect_communities=True, weight_intra=3, weight_inter=1):
+    """Creates a graph based on community assignments and strengths."""
+    G = nx.Graph()
+    num_nodes = len(nodes)
+    G.add_nodes_from(nodes)
+
+    # Add intra- and inter-community edges
+    for i in range(num_nodes):
+        for j in range(i + 1, num_nodes):
+            # Check if nodes exist in assignment (might not if graph is changing)
+            if i not in community_assignment or j not in community_assignment:
+                continue
+            same_group = community_assignment[i] == community_assignment[j]
+            p = intra_p if same_group else inter_p
+            if random.random() < p:
+                G.add_edge(i, j, weight=weight_intra if same_group else weight_inter)
+
+    # Optionally force minimal connectivity between communities
+    if connect_communities:
+        community_nodes = {}
+        # Ensure all groups present in the assignment are considered
+        present_groups = set(community_assignment.values())
+        for group in present_groups:
+             community_nodes[group] = [node for node, grp in community_assignment.items() if grp == group]
+
+        sorted_groups = sorted(present_groups)
+        for idx in range(len(sorted_groups) - 1):
+            group_a = sorted_groups[idx]
+            group_b = sorted_groups[idx+1]
+            # Ensure both communities have nodes before attempting to add an edge
+            if community_nodes.get(group_a) and community_nodes.get(group_b):
+                 node_a = random.choice(community_nodes[group_a])
+                 node_b = random.choice(community_nodes[group_b])
+                 # Add edge only if it doesn't exist, using the inter-community weight
+                 if not G.has_edge(node_a, node_b):
+                    G.add_edge(node_a, node_b, weight=weight_inter) # Use inter_weight for consistency
+
+    return G
+
+
+# --- Main Generator Functions ---
 
 ''' Split triggered at time T: We identify the group to split, say group g.
-We gather that group’s nodes, shuffle them, and schedule them for “phased reassignment” over the next d steps.
+We gather that group's nodes, shuffle them, and schedule them for "phased reassignment" over the next d steps.
 Phased Reassignment from T to T+d−1:
-Each step, we move a chunk of that group’s nodes to the new group ID.
+Each step, we move a chunk of that group's nodes to the new group ID.
 By the end of d steps, the entire subset is reassigned.
 This looks more organic in your network, rather than an abrupt jump. '''
 
@@ -30,6 +90,7 @@ def generate_dynamic_graphs(
         num_nodes (int): Total number of nodes.
         num_steps (int): Number of timesteps (snapshots).
         initial_groups (int): Initial number of communities.
+        init_mode (str): Initial assignment mode (random, block)
         change_rate (float): Fraction of nodes that change groups randomly each step.
         intra_community_strength (float): Probability of an edge within a community.
         inter_community_strength (float): Probability of an edge between communities.
@@ -51,9 +112,11 @@ def generate_dynamic_graphs(
 
     community_assignment = {}
 
-    if init_mode == "round_robin":
-        # Initial round-robin assignment (if num_groups==1, all nodes start in group 0)
-        community_assignment = {node: node % initial_groups for node in nodes}
+    if init_mode == "random":
+        # Randomly assign nodes to groups
+        community_assignment = {}
+        for node in nodes:
+            community_assignment[node] = random.choice(range(initial_groups))
 
     elif init_mode == "block":
         nodes_per_group = num_nodes // initial_groups
@@ -89,8 +152,8 @@ def generate_dynamic_graphs(
                 same_group = community_assignment[i] == community_assignment[j]
                 p = intra_community_strength if same_group else inter_community_strength
                 if random.random() < p:
-                    # Use weight 1.0 for intra-group, 0.3 for inter-group
-                    G.add_edge(i, j, weight=1.0 if same_group else 0.3)
+                    # Use weight 3 for intra-group, 1 for inter-group
+                    G.add_edge(i, j, weight=3 if same_group else 1)  # Centrality Algorithm needs integer weights!!
         
         # Force minimal connectivity between communities (to help with visualization)
         # Here, we add a very weak edge between a randomly chosen node from each adjacent group.
@@ -101,7 +164,7 @@ def generate_dynamic_graphs(
         for idx in range(len(sorted_groups)-1):
             node_a = random.choice(community_nodes[sorted_groups[idx]])
             node_b = random.choice(community_nodes[sorted_groups[idx+1]])
-            G.add_edge(node_a, node_b, weight=0.01)
+            G.add_edge(node_a, node_b, weight=1) # was 0.01
         
         # Record current graph and ground truth.
         graphs[t] = G
@@ -131,60 +194,60 @@ def generate_dynamic_graphs(
             if t < merge_info["end_step"] and merge_info["remaining_nodes"]:
                 still_ongoing_merges.append(merge_info)
             else:
-                # Merge-Event ist zu Ende; falls keine Knoten mehr in der Quellgruppe sind, entferne sie.
+                # end of merge event
                 remaining_in_src = [n for n, g in community_assignment.items() if g == merge_info["src"]]
                 if not remaining_in_src:
                     active_groups.discard(merge_info["src"])
         ongoing_merges = still_ongoing_merges
         
         # Process ongoing split events with fixed interval.
-        '''
-        still_ongoing_splits = []
-        for split_info in ongoing_splits:
-            if t < split_info["end_step"]:
-                elapsed = t - split_info["start"]
-                expected_moves = int(elapsed // split_info["interval"]) + 1
-                moves_to_do = expected_moves - split_info["nodes_moved"]
-                if moves_to_do > 0:
-                    num_remaining = len(split_info["remaining_nodes"])
-                    num_to_move = min(moves_to_do, num_remaining)
-                    #Move the next num_to_move nodes evenly.
-                    to_move = split_info["remaining_nodes"][:num_to_move]  # slice: Get the first num_to_move elements
-                    split_info["remaining_nodes"] = split_info["remaining_nodes"][num_to_move:]
-                    for node in to_move:
-                        community_assignment[node] = split_info["new_group"]
-                    split_info["nodes_moved"] += num_to_move
-                    
-                    
-                if t < split_info["end_step"] and split_info["remaining_nodes"]:
-                    still_ongoing_splits.append(split_info)
-        ongoing_splits = still_ongoing_splits
-        '''
         
-        still_ongoing_splits = []
-        for split_info in ongoing_splits:
-            if t < split_info["end_step"]:
-                elapsed = t - split_info["start"]
-                expected_moves = int(elapsed // split_info["interval"]) + 1
-                already_moved = split_info["nodes_moved"]
-                moves_to_do = expected_moves - already_moved
-                if moves_to_do > 0:
-                    # Dynamically select live candidates still in old group
-                    candidates = [n for n, g in community_assignment.items() if g == split_info["group_to_split"]]
-                    remaining_to_move = split_info["split_size"] - already_moved
-                    num_to_move = min(moves_to_do, remaining_to_move, len(candidates))
-                    
-                    # Use sorted order for reproducibility (optional)
-                    to_move = sorted(candidates)[:num_to_move]
-                    
-                    for node in to_move:
-                        community_assignment[node] = split_info["new_group"]
-                    
-                    split_info["nodes_moved"] += num_to_move
+        if init_mode == "random":
+            still_ongoing_splits = []
+            for split_info in ongoing_splits:
+                if t < split_info["end_step"]:
+                    elapsed = t - split_info["start"]
+                    expected_moves = int(elapsed // split_info["interval"]) + 1
+                    moves_to_do = expected_moves - split_info["nodes_moved"]
+                    if moves_to_do > 0:
+                        num_remaining = len(split_info["remaining_nodes"])
+                        num_to_move = min(moves_to_do, num_remaining)
+                        #Move the next num_to_move nodes evenly.
+                        to_move = split_info["remaining_nodes"][:num_to_move]  # slice: Get the first num_to_move elements
+                        split_info["remaining_nodes"] = split_info["remaining_nodes"][num_to_move:]
+                        for node in to_move:
+                            community_assignment[node] = split_info["new_group"]
+                        split_info["nodes_moved"] += num_to_move
+                        
+                    if t < split_info["end_step"] and split_info["remaining_nodes"]:
+                        still_ongoing_splits.append(split_info)
+            ongoing_splits = still_ongoing_splits
+        
+        else:
+            still_ongoing_splits = []
+            for split_info in ongoing_splits:
+                if t < split_info["end_step"]:
+                    elapsed = t - split_info["start"]
+                    expected_moves = int(elapsed // split_info["interval"]) + 1
+                    already_moved = split_info["nodes_moved"]
+                    moves_to_do = expected_moves - already_moved
+                    if moves_to_do > 0:
+                        # Dynamically select live candidates still in old group
+                        candidates = [n for n, g in community_assignment.items() if g == split_info["group_to_split"]]
+                        remaining_to_move = split_info["split_size"] - already_moved
+                        num_to_move = min(moves_to_do, remaining_to_move, len(candidates))
+                        
+                        # Use sorted order for reproducibility (optional)
+                        to_move = sorted(candidates)[:num_to_move]
+                        
+                        for node in to_move:
+                            community_assignment[node] = split_info["new_group"]
+                        
+                        split_info["nodes_moved"] += num_to_move
 
-                if t < split_info["end_step"] and split_info["nodes_moved"] < split_info["split_size"]:
-                    still_ongoing_splits.append(split_info)
-        ongoing_splits = still_ongoing_splits
+                    if t < split_info["end_step"] and split_info["nodes_moved"] < split_info["split_size"]:
+                        still_ongoing_splits.append(split_info)
+            ongoing_splits = still_ongoing_splits
 
         
         # Check for new split events at this timestep.
@@ -196,19 +259,36 @@ def generate_dynamic_graphs(
                     split_interval = duration / split_size if split_size > 0 else duration
                     new_group_id = max(active_groups) + 1
                     active_groups.add(new_group_id)
+                    print(f"[t={t}] New group created from split: {new_group_id}")
                     end_step = t + duration
+
+                    # for random split event: 
                     #nodes_to_move = random.sample(nodes_in_group, split_size)
-                    ongoing_splits.append({
+
+                    if init_mode == "random":
+                        nodes_to_move = random.sample(nodes_in_group, split_size)
+                        ongoing_splits.append({
                         "start": t,
                         "end_step": end_step,
-                        #"remaining_nodes": nodes_to_move,
-                        #"old_group": group_to_split,
+                        "remaining_nodes": nodes_to_move,
+                        "old_group": group_to_split,
                         "group_to_split": group_to_split,
                         "new_group": new_group_id,
                         "split_size": split_size,
                         "interval": split_interval,
                         "nodes_moved": 0
                     })
+                        
+                    else:
+                        ongoing_splits.append({
+                            "start": t,
+                            "end_step": end_step,
+                            "group_to_split": group_to_split,
+                            "new_group": new_group_id,
+                            "split_size": split_size,
+                            "interval": split_interval,
+                            "nodes_moved": 0
+                        })
                     
         # Check for new merge events at this timestep.
         if merge_events and t in merge_events:
@@ -305,11 +385,11 @@ def generate_split_merge_data(
         seed=seed
     )
 
-def generate_proportional_transition(
+def generate_proportional_transitionOLD(
     num_nodes=30,
     num_steps=10,
-    initial_state=None,   # z.B. {0: 25, 1: 25, 2: 25, 3: 25} (Prozentwerte, Summe=100)
-    final_state=None,     # z.B. {0: 10, 1: 50, 2: 20, 3: 20} 
+    initial_state=None,   # z.B. {0: 25, 1: 25} (Prozentwerte, Summe=100)
+    final_state=None,     
     intra_community_strength=1.0,
     inter_community_strength=0.1,
     seed=42
@@ -321,9 +401,9 @@ def generate_proportional_transition(
     Input:
         num_nodes (int): Total number of nodes in the network.
         num_steps (int): Number of timesteps (snapshots).
-        initial_state (dict): The initial state of the group distribution, e.g., {0: 25, 1: 25, 2: 25, 3: 25}
+        initial_state (dict): The initial state of the group distribution, e.g., {0: 25, 1: 25, 2: 25}
                             (percentage values, sum = 100).
-        final_state (dict): The final state of the group distribution, e.g., {0: 10, 1: 50, 2: 20, 3: 20}.
+        final_state (dict): The final state of the group distribution, e.g., {0: 10, 1: 50, 2: 20}.
         intra_community_strength (float): The probability for an edge within the same group.
         inter_community_strength (float): The probability for an edge between different groups.
         seed (int): Seed for the random number generator.
@@ -437,7 +517,7 @@ def generate_proportional_transition(
                 same_group = community_assignment[i] == community_assignment[j]
                 p = intra_community_strength if same_group else inter_community_strength
                 if random.random() < p:
-                    G.add_edge(i, j, weight=1.0 if same_group else 0.3)
+                    G.add_edge(i, j, weight=3 if same_group else 1)
         
         # weak edges between communities for visualization
         community_nodes = {}
@@ -447,7 +527,7 @@ def generate_proportional_transition(
         for idx in range(len(sorted_groups)-1):
             node_a = random.choice(community_nodes[sorted_groups[idx]])
             node_b = random.choice(community_nodes[sorted_groups[idx+1]])
-            G.add_edge(node_a, node_b, weight=0.01)
+            G.add_edge(node_a, node_b, weight=1)
         
         graphs[t] = G
         ground_truth[t] = community_assignment.copy()
@@ -457,7 +537,6 @@ def generate_proportional_transition(
             change_log[t] = changes
     
     return graphs, ground_truth, change_log
-
 
 
 def generate_dynamic_graphs_old(
@@ -539,3 +618,201 @@ def generate_dynamic_graphs_old(
             community_assignment[node] = new_group
 
     return graphs, ground_truth, change_log
+
+def generate_proportional_transition(
+    num_nodes=30,
+    num_steps=10,
+    initial_state=None,
+    final_state=None,
+    states=None,  # New: list of (timestep, state) pairs
+    intra_community_strength=1.0,
+    inter_community_strength=0.1,
+    seed=42
+):
+    """
+    Generate dynamic graphs where group proportions change over time,
+    supporting intermediate states defined either by a list of tuples or a custom string format.
+    
+    Args:
+        num_nodes (int): Total number of nodes.
+        num_steps (int): Number of timesteps (snapshots).
+        initial_state (dict): Group distribution at t=0.
+        final_state (dict): Group distribution at t=num_steps-1.
+        states (list | str | None): Intermediate states. Can be:
+            - None: Linear transition from initial_state to final_state.
+            - list: List of (timestep, state_dict) tuples.
+            - str: Custom format 't1={{...}}; t2={{...}}'
+        intra_community_strength (float): Intra-group edge probability.
+        inter_community_strength (float): Inter-group edge probability.
+        seed (int): Random seed.
+
+    Returns:
+        graphs (dict): Mapping timestep -> nx.Graph.
+        ground_truth (dict): Mapping timestep -> {node: group_id}.
+        change_log (dict): Mapping timestep -> list of changed nodes.
+    """
+
+    random.seed(seed)
+    nodes = list(range(num_nodes))
+
+    # --- Handle state inputs and parse custom string format if provided ---
+    parsed_states = []
+    if states is None:
+        if initial_state is None:
+            initial_state = {0: 100}
+        if final_state is None:
+            final_state = initial_state.copy()
+        parsed_states = [(0, initial_state), (num_steps - 1, final_state)]
+    elif isinstance(states, str):
+        if initial_state is None or final_state is None:
+            raise ValueError("initial_state and final_state must be provided when using string format for intermediate states.")
+        parsed_states.append((0, initial_state))
+        try:
+            state_definitions = states.strip().split(';')
+            for definition in state_definitions:
+                if not definition.strip():
+                    continue
+                time_str, dict_str = definition.split('=', 1)
+                timestep = int(time_str.strip())
+                state_dict = ast.literal_eval(dict_str.strip())
+                if not isinstance(state_dict, dict):
+                    raise TypeError("Parsed state is not a dictionary.")
+                parsed_states.append((timestep, state_dict))
+        except Exception as e:
+            raise ValueError(f"Error parsing states string: {e}. Format should be 't1={{...}}; t2={{...}}'.") from e
+        parsed_states.append((num_steps - 1, final_state))
+        parsed_states = sorted(parsed_states, key=lambda x: x[0]) # Ensure sorted by time
+    elif isinstance(states, list):
+        # Assume it's already in the correct list-of-tuples format
+        parsed_states = sorted(states, key=lambda x: x[0])
+    else:
+        raise TypeError("states argument must be a list, string, or None.")
+
+    # Validation
+    for _, state in parsed_states:
+        if abs(sum(state.values()) - 100) > 1e-6:
+            raise ValueError("Each state's percentages must sum to 100.")
+
+    all_groups = set()
+    for _, state in parsed_states:
+        all_groups.update(state.keys())
+    all_groups = sorted(list(all_groups)) # Ensure it's a list for sorting in helper
+
+    # Helper: convert percentages to counts
+    def percentages_to_counts(state):
+        counts = {g: (state.get(g, 0) / 100) * num_nodes for g in all_groups}
+        rounded = {g: int(math.floor(counts[g])) for g in counts}
+        remaining = num_nodes - sum(rounded.values())
+        remainder_groups = sorted(all_groups, key=lambda g: counts[g] - rounded[g], reverse=True)
+        for g in remainder_groups:
+            if remaining <= 0:
+                break
+            rounded[g] += 1
+            remaining -= 1
+        return rounded
+
+    # Helper: interpolate between two states
+    def interpolate_states(states, t):
+        # Use the parsed_states list internally
+        for idx in range(len(parsed_states)-1):
+            t_start, state_start = parsed_states[idx]
+            t_end, state_end = parsed_states[idx+1]
+            if t_start <= t <= t_end:
+                break
+        else:
+            # If t is beyond the last defined state, return the last state
+            return parsed_states[-1][1]
+
+        fraction = (t - t_start) / (t_end - t_start) if t_end > t_start else 0
+        interpolated = {}
+        for g in all_groups:
+            val_start = state_start.get(g, 0)
+            val_end = state_end.get(g, 0)
+            interpolated[g] = val_start + fraction * (val_end - val_start)
+        return interpolated
+
+    # Initialize first assignment
+    # Use the parsed_states list internally
+    init_state_interpolated = interpolate_states(parsed_states, 0)
+    init_counts = _percentages_to_counts(init_state_interpolated, all_groups, num_nodes) # percentages_to_counts(init_state_interpolated)
+
+    all_nodes = nodes.copy()
+    #random.shuffle(all_nodes) # shuffle the nodes for random assignment
+    community_assignment = {}
+    index = 0
+    for g in all_groups:
+        count = init_counts.get(g, 0)
+        for _ in range(count):
+            community_assignment[all_nodes[index]] = g
+            index += 1
+
+    graphs = {}
+    ground_truth = {}
+    change_log = {}
+
+    for t in range(num_steps):
+        # Use the parsed_states list internally
+        interpolated_state = interpolate_states(parsed_states, t)
+        desired_counts = _percentages_to_counts(interpolated_state, all_groups, num_nodes)
+
+        current_counts = {g: sum(1 for n in community_assignment.values() if n == g) for g in all_groups}
+        
+        excess = {g: current_counts[g] - desired_counts[g] for g in all_groups if current_counts[g] > desired_counts[g]}
+        deficit = {g: desired_counts[g] - current_counts[g] for g in all_groups if current_counts[g] < desired_counts[g]}
+
+        # Transfer nodes
+        for g_excess in list(excess.keys()):
+            if excess[g_excess] <= 0:
+                continue
+            nodes_in_excess = [n for n, grp in community_assignment.items() if grp == g_excess]
+            for g_deficit in list(deficit.keys()):
+                if deficit[g_deficit] <= 0:
+                    continue
+                transfer = min(excess[g_excess], deficit[g_deficit])
+                for node in nodes_in_excess[:transfer]:
+                    community_assignment[node] = g_deficit
+                nodes_in_excess = nodes_in_excess[transfer:]
+                excess[g_excess] -= transfer
+                deficit[g_deficit] -= transfer
+                if excess[g_excess] <= 0:
+                    break
+
+        # Build graph
+        G = nx.Graph()
+        G.add_nodes_from(nodes)
+        for i in range(num_nodes):
+            for j in range(i+1, num_nodes):
+                same_group = community_assignment[i] == community_assignment[j]
+                p = intra_community_strength if same_group else inter_community_strength
+                if random.random() < p:
+                    G.add_edge(i, j, weight=3 if same_group else 1)
+
+        # Optionally: enforce weak links between communities
+        community_nodes = {g: [n for n, grp in community_assignment.items() if grp == g] for g in all_groups}
+        sorted_groups = sorted(community_nodes.keys())
+        for idx in range(len(sorted_groups)-1):
+            if community_nodes[sorted_groups[idx]] and community_nodes[sorted_groups[idx+1]]:
+                node_a = random.choice(community_nodes[sorted_groups[idx]])
+                node_b = random.choice(community_nodes[sorted_groups[idx+1]])
+                G.add_edge(node_a, node_b, weight=1)
+        G = _create_graph(
+            nodes,
+            community_assignment,
+            intra_community_strength,
+            inter_community_strength,
+            connect_communities=True,
+            weight_intra=3,
+            weight_inter=1
+        )
+
+        graphs[t] = G
+        ground_truth[t] = community_assignment.copy()
+        if t > 0:
+            prev_state = ground_truth[t-1]
+            changes = [n for n in nodes if community_assignment[n] != prev_state[n]]
+            change_log[t] = changes
+
+    return graphs, ground_truth, change_log
+
+
+

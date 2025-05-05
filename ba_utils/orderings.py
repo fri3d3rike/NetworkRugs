@@ -56,6 +56,37 @@ def calculate_priority(graph, current_node, neighbor):
 def sort_by_priority(graph, current_node, neighbors):
     return sorted(neighbors, key=lambda neighbor: calculate_priority(graph, current_node, neighbor))
 
+def get_start_node(graphs, metric='degree', mode='highest'):
+    """
+    Select a single consistent start node based on the first graph (timestamp 0 by default).
+    """
+    first_timestamp = min(graphs.keys())
+    G0 = graphs[first_timestamp]
+    
+    if metric == 'degree':
+        values = dict(G0.degree())
+    elif metric == 'closeness_centrality':
+        values = nx.closeness_centrality(G0)
+    elif metric == 'betweenness_centrality':
+        values = nx.betweenness_centrality(G0)
+    elif metric == 'eigenvector_centrality':
+        values = nx.eigenvector_centrality(G0, max_iter=10000, tol=1e-6, weight='weight')
+    else:
+        raise ValueError(f"Unsupported metric: {metric}")
+
+    if mode == 'highest':
+        chosen_node = max(values, key=values.get)
+    elif mode == 'lowest':
+        chosen_node = min(values, key=values.get)
+    else:
+        raise ValueError(f"Mode must be 'highest' or 'lowest'.")
+
+    # Now use same node for all timestamps
+    start_nodes = {timestamp: chosen_node for timestamp in graphs.keys()}
+    
+    return start_nodes
+
+
 def get_DFS_ordering(graphs, start_nodes=None):
     """
     Perform DFS on each graph, prioritizing edges with the highest influence.

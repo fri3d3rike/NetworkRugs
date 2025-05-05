@@ -23,11 +23,11 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='tur
     """
     if order == "priority":
         ordering = get_priority_bfs_ordering(graphs, start_nodes)
-    if order == "bfs":
+    elif order == "bfs":
         ordering = get_BFS_ordering(graphs, start_nodes, sorting_key='weight')
-    if order == "dfs":
+    elif order == "dfs":
         ordering = get_DFS_ordering(graphs, start_nodes)
-    if order == "degree":
+    elif order == "degree":
         ordering = get_centrality_ordering(graphs, centrality_measure="degree")
     else:
         ordering = get_priority_bfs_ordering(graphs, start_nodes)
