@@ -2,7 +2,6 @@ import numpy as np
 import networkx as nx
 import heapq
 import matplotlib.pyplot as plt
-#import community as community_louvain
 import community.community_louvain as community_louvain
 
 

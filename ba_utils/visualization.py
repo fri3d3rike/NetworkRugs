@@ -13,6 +13,7 @@ from PIL import Image
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
+import ba_utils.interface as interface
 
 # run this command to run
 # python -m ba_utils.visualization
@@ -205,7 +206,7 @@ def draw_rug_from_graphs(graphs_data, ordering, color_encoding='id', colormap='t
     if fig is None and ax is not None:
         fig = ax.get_figure() 
     
-    enable_hover(ax, fig, timestamps, ordering, pixel_size)
+    interface.enable_simple_hover(ax, fig, timestamps, ordering, pixel_size)
     
     return fig if ax is None else None
 
@@ -350,7 +351,7 @@ def draw_rug_with_color_mapping(graphs_data, ordering, color_encoding='id', colo
     if fig is None and ax is not None:
         fig = ax.get_figure()
 
-    enable_hover(ax, fig, timestamps, ordering, pixel_size)
+    interface.enable_simple_hover(ax, fig, timestamps, ordering, pixel_size)
 
     return (fig if fig is not None else ax.get_figure()), color_mapping
 
@@ -713,46 +714,3 @@ def visualize_adjacency_matrix(adjacency_matrix, node_order_in_matrix, title="Re
     plt.colorbar(label="Connection Strength")
     plt.grid(False)
     plt.show()
-    
-
-#### Interaction with Tkinter GUI
-
-def enable_hover(ax, fig, timestamps, ordering, pixel_size):
-    annot = ax.annotate(
-        "", xy=(0, 0), xytext=(10, 10), textcoords="offset points",
-        bbox=dict(boxstyle="round", fc="w"),
-        arrowprops=dict(arrowstyle="->")
-    )
-    annot.set_visible(False)
-
-    def motion(event):
-        if event.inaxes != ax or event.xdata is None or event.ydata is None:
-            annot.set_visible(False)
-            fig.canvas.draw_idle()
-            return
-
-        x_idx = int(event.xdata // pixel_size)
-        y_idx = int(event.ydata // pixel_size)
-
-        if x_idx >= len(timestamps):
-            annot.set_visible(False)
-            fig.canvas.draw_idle()
-            return
-
-        timestamp = timestamps[x_idx]
-        node_order = ordering.get(timestamp, [])
-        if y_idx >= len(node_order):
-            annot.set_visible(False)
-            fig.canvas.draw_idle()
-            return
-
-        node_id = node_order[y_idx]
-
-        annot.xy = (event.xdata, event.ydata)
-        annot.set_text(f"Time: {timestamp}\nNode ID: {node_id}")
-        annot.set_visible(True)
-        fig.canvas.draw_idle()
-
-    fig.canvas.mpl_connect("motion_notify_event", motion)
-
-    
