@@ -228,6 +228,27 @@ def enable_click(ax, fig, graphs_data, ordering, color_mapping, pixel_size=40):
 
     canvas.mpl_connect('button_press_event', on_click)
 
+def create_tooltip(widget, text):
+    tooltip = None
+    def show_tooltip(event):
+        nonlocal tooltip
+        x, y, _, _ = widget.bbox("insert")
+        x += widget.winfo_rootx() + 25
+        y += widget.winfo_rooty() + 25
+        tooltip = tk.Toplevel(widget)
+        tooltip.wm_overrideredirect(True)
+        tooltip.wm_geometry(f"+{x}+{y}")
+        label = ttk.Label(tooltip, text=text, justify='left',
+                            background="#ffffe0", relief='solid', borderwidth=1,
+                            padding=(5, 2, 5, 2))
+        label.pack()
+    def hide_tooltip(event):
+        nonlocal tooltip
+        if tooltip:
+            tooltip.destroy()
+            tooltip = None
+    widget.bind('<Enter>', show_tooltip)
+    widget.bind('<Leave>', hide_tooltip)
 
 # Global graph data
 graphs_data = {}
@@ -247,7 +268,7 @@ def open_rug_window():
     rug_window.protocol("WM_DELETE_WINDOW", on_rug_window_close)
 
     color_options = ['id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
-    ordering_options = ['priority', 'dfs', 'bfs']
+    ordering_options = ['priority', 'priority_tunable', 'dfs', 'bfs']
     start_node_options = ['degree', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality', 'id']
     start_node_mode_options = ['highest', 'lowest']
     colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
@@ -260,6 +281,7 @@ def open_rug_window():
     label_var = tk.BooleanVar()
     mapper_type_var = tk.StringVar(value='linear')
     colormap_var = tk.StringVar(value='turbo')
+    parameters_var = tk.StringVar(value="w=1,d=1,c=1")
 
     control_frame = ttk.Frame(rug_window)
     control_frame.pack(side='top', fill='x', pady=10)
@@ -286,6 +308,43 @@ def open_rug_window():
 
     ttk.Checkbutton(control_frame, text="Show Labels", variable=label_var).grid(row=1, column=3, padx=5)
 
+        # Placeholder for the "Parameters" input field
+    parameters_label = None
+    parameters_entry = None
+
+    def update_parameters_input(*args):
+        nonlocal parameters_label, parameters_entry
+        if order_var.get() == "priority_tunable":
+            if not parameters_label and not parameters_entry:
+                parameters_label = ttk.Label(control_frame, text="Parameters  (?)")
+                parameters_label.grid(row=1, column=4, padx=5)
+                create_tooltip(
+                    parameters_label,
+                    "Format: w=<float>,d=<float>,c=<float>\n"
+                    "Example: w=0.5,d=1,c=0\n"
+                    "Effect:\n"
+                    "- w: Higher values prioritize stronger edge weights.\n"
+                    "- d: Higher values prioritize high-degree nodes.\n"
+                    "- c: Higher values prioritize nodes with more common neighbors. \n"
+                    " \n"
+                    "d > 0: high-degree nodes → higher priority \n"
+                    "d < 0: low-degree nodes → higher priority \n"
+                    "|d|: magnitude tunes strength of that effect" 
+                )
+                parameters_entry = ttk.Entry(control_frame, textvariable=parameters_var)
+                parameters_entry.grid(row=1, column=5, padx=5)
+        else:
+            if parameters_label:
+                parameters_label.destroy()
+                parameters_label = None
+            if parameters_entry:
+                parameters_entry.destroy()
+                parameters_entry = None
+
+    # Bind the update function to the order_var changes
+    order_var.trace_add("write", update_parameters_input)
+
+
     rug_canvas = ttk.Frame(rug_window)
     rug_canvas.pack(fill='both', expand=True)
 
@@ -304,6 +363,23 @@ def open_rug_window():
         if order_var.get() == "priority":
             ordering = orderings.get_priority_bfs_ordering(graphs_data, start_nodes)
             print("Using priority BFS ordering")
+        elif order_var.get() == "priority_tunable":
+            parameters = parameters_var.get()
+            if parameters == "":
+                ordering = orderings.get_normalized_priority_bfs_ordering(graphs_data, start_nodes)
+                print("Using normalized priority BFS with default parameters")
+            else:
+                try:
+                    # Parse the parameters string (e.g., "w=0.5,d=1,c=0")
+                    param_dict = dict(item.split('=') for item in parameters.split(','))
+                    w = float(param_dict.get('w', 1.0))  # Default to 1.0 if not provided
+                    d = float(param_dict.get('d', 1.0))
+                    c = float(param_dict.get('c', 1.0))
+                    print(f"Using priority tunable BFS ordering with parameters: w={w}, d={d}, c={c}")
+                    ordering = orderings.get_normalized_priority_bfs_ordering(graphs_data, start_nodes, w=w, d=d, c=c)
+                except Exception as e:
+                    print(f"Error parsing parameters: {e}")
+                    return
         elif order_var.get() == "bfs":
             ordering = orderings.get_BFS_ordering(graphs_data, start_nodes, sorting_key='weight')
             print("Using BFS ordering")
@@ -341,8 +417,7 @@ def open_rug_window():
     render_rug()
     ttk.Button(control_frame, text="Render Rug", command=render_rug).grid(row=2, column=0, columnspan=4, pady=10)
 
-    def save_figure():
-        fig = render_rug()
+    def save_figure(fig):
         if fig:
             timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
             config_str = (
@@ -359,7 +434,7 @@ def open_rug_window():
             fig.savefig(full_path, dpi=300, bbox_inches='tight')
             print(f"Figure saved as {full_path}")
 
-    ttk.Button(control_frame, text="Save as PNG", command=save_figure).grid(row=2, column=4, columnspan=2, pady=10)
+    ttk.Button(control_frame, text="Save as PNG", command=lambda: save_figure(render_rug())).grid(row=2, column=4, columnspan=2, pady=10)
 
 
 def start_gui():
@@ -402,28 +477,6 @@ def start_gui():
     merge_events_var = tk.StringVar(value="{50: [(0, 1, 20)]}")
     state_input_var = tk.StringVar(value="20={0:100,1:0,2:0}; 40={0:70,1:20,2:10}")
 
-    def create_tooltip(widget, text):
-        tooltip = None
-        def show_tooltip(event):
-            nonlocal tooltip
-            x, y, _, _ = widget.bbox("insert")
-            x += widget.winfo_rootx() + 25
-            y += widget.winfo_rooty() + 25
-            tooltip = tk.Toplevel(widget)
-            tooltip.wm_overrideredirect(True)
-            tooltip.wm_geometry(f"+{x}+{y}")
-            label = ttk.Label(tooltip, text=text, justify='left',
-                             background="#ffffe0", relief='solid', borderwidth=1,
-                             padding=(5, 2, 5, 2))
-            label.pack()
-        def hide_tooltip(event):
-            nonlocal tooltip
-            if tooltip:
-                tooltip.destroy()
-                tooltip = None
-        widget.bind('<Enter>', show_tooltip)
-        widget.bind('<Leave>', hide_tooltip)
-
     def update_dynamic_inputs(*args):
         for widget in dynamic_widgets_frame.winfo_children():
             widget.destroy()
@@ -432,21 +485,21 @@ def start_gui():
             ttk.Label(dynamic_widgets_frame, text="Initial State").grid(row=0, column=0, sticky='e')
             initial_entry = ttk.Entry(dynamic_widgets_frame, textvariable=input_state_var, width=30)
             initial_entry.grid(row=0, column=1)
-            initial_help = ttk.Label(dynamic_widgets_frame, text="?")
+            initial_help = ttk.Label(dynamic_widgets_frame, text="(?)")
             initial_help.grid(row=0, column=2)
             create_tooltip(initial_help, "Format: {group_id: percentage, ...}\nExample: {0:25, 1:25, 2:50} means 25% in group 0, 25% in group 1, and 50% in group 2")
 
             ttk.Label(dynamic_widgets_frame, text="Intermediate States").grid(row=1, column=0, sticky='e')
             intermediate_entry = ttk.Entry(dynamic_widgets_frame, textvariable=state_input_var, width=30)
             intermediate_entry.grid(row=1, column=1)
-            intermediate_help = ttk.Label(dynamic_widgets_frame, text="?")
+            intermediate_help = ttk.Label(dynamic_widgets_frame, text="(?)")
             intermediate_help.grid(row=1, column=2)
             create_tooltip(intermediate_help, "Format: timestep={group_id: percentage, ...}; timestep={...}\nExample: 20={0:100,1:0,2:0}; 40={0:70,1:20,2:10} defines states at t=20 and t=40")
 
             ttk.Label(dynamic_widgets_frame, text="Final State").grid(row=2, column=0, sticky='e')
             final_entry = ttk.Entry(dynamic_widgets_frame, textvariable=final_state_var, width=30)
             final_entry.grid(row=2, column=1)
-            final_help = ttk.Label(dynamic_widgets_frame, text="?")
+            final_help = ttk.Label(dynamic_widgets_frame, text="(?)")
             final_help.grid(row=2, column=2)
             create_tooltip(final_help, "Format: {group_id: percentage, ...}\nExample: {0:10, 1:50, 2:40} means 10% in group 0, 50% in group 1, and 40% in group 2")
 
@@ -462,7 +515,7 @@ def start_gui():
             split_label.grid(row=2, column=0, sticky='e')
             split_entry = ttk.Entry(dynamic_widgets_frame, textvariable=split_events_var)
             split_entry.grid(row=2, column=1)
-            split_help = ttk.Label(dynamic_widgets_frame, text="?")
+            split_help = ttk.Label(dynamic_widgets_frame, text="(?)")
             split_help.grid(row=2, column=2)
             create_tooltip(split_help, "Format: {timestamp: [(group to split, duration).]..}\nExample: {10: [(0, 50)]} means at t=10, group 0 splits for 50 timesteps")
             
@@ -471,7 +524,7 @@ def start_gui():
             merge_label.grid(row=3, column=0, sticky='e')
             merge_entry = ttk.Entry(dynamic_widgets_frame, textvariable=merge_events_var)
             merge_entry.grid(row=3, column=1)
-            merge_help = ttk.Label(dynamic_widgets_frame, text="?")
+            merge_help = ttk.Label(dynamic_widgets_frame, text="(?)")
             merge_help.grid(row=3, column=2)
             create_tooltip(merge_help, "Format: {timestep: [(source, destination, duration).]..}\nExample: {20: [(1, 2, 50)]} means at t=20, group 1 merges into group 2 for 50 timesteps")
 

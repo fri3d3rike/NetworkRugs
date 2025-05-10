@@ -3,6 +3,7 @@ import networkx as nx
 import heapq
 import matplotlib.pyplot as plt
 import community.community_louvain as community_louvain
+import itertools
 
 
 # nodes with higher weights: come first
@@ -27,30 +28,132 @@ def sort_by_common_neighbors(graph, node):
     #print(timestamp, node, neighbors)
     return neighbors
 
-# Priority: combine edge weight, degree, and common neighbors
-def calculate_priority(graph, current_node, neighbor):
-    """
-    - calculates a priority score for a neighbor node based on a combination of edge weight,
-    node degree, and number of common neighbors
-    - intended for use in BFS traversal strategies where a priority queue is
-    used to determine the order of node expansion
-    - the computed priority ensures that nodes with stronger and more structurally significant connections are visited earlier.
 
-    Priority is defined as:
-        -edge_weight + 1 / (degree + 1) - number_of_common_neighbors
+def compute_global_stats(graphs):
+    """
+    Given a dict of timestamp→Graph, returns
+    (min_w, max_w), (min_d, max_d), (min_c, max_c)
+    for edge-weights, node-degrees, and common-neighbor counts.
+    """
+    all_ws, all_ds, all_cs = [], [], []
+    for G in graphs.values():
+        # collect edge weights
+        for u,v,data in G.edges(data=True):
+            all_ws.append(data.get('weight', 1))
+        # collect node degrees
+        for n in G.nodes():
+            all_ds.append(G.degree(n))
+        # collect counts of common neighbors for every pair
+        for u,v in itertools.combinations(G.nodes(), 2):
+            c = len(list(nx.common_neighbors(G, u, v)))
+            all_cs.append(c)
+
+    min_w, max_w = min(all_ws), max(all_ws)
+    min_d, max_d = min(all_ds), max(all_ds)
+    min_c, max_c = min(all_cs), max(all_cs)
+    return (min_w, max_w), (min_d, max_d), (min_c, max_c)
+
+def norm(x, xmin, xmax):
+    """Normalize a value between xmin and xmax to [0,1] range."""
+    return (x - xmin) / (xmax - xmin + 1e-9)
+
+
+# Priority: combine edge weight, degree, and common neighbors
+def calculate_priority(graph, current_node, neighbor, stats):
+    """
+    Calculates a priority score for a neighbor node based on a combination of three normalized structural metrics:
+
+    avoids hub dominance by favoring low-degree neighbors and penalizes redundant paths by considering common neighbors
+
+    1. Edge Weight (strength of the connection)
+    2. Node Degree (connectivity of the neighbor)
+    3. Common Neighbors (shared connections with the current node)
+
+    Intended for use in BFS traversal strategies where a priority queue determines the order of node expansion. 
+    The computed priority ensures that nodes with stronger and more structurally significant connections are visited earlier and less informative or overly connected nodes later.
+
+    Priority formula:
+    old:
+        score = - (edge_weight_normalized + 1 / (degree_normalized + 1) + common_neighbors_normalized)
+    new:
+        score = -edge_weight_normalized - 1/(degree_normalized + 1) - common_neighbors_normalized
+    where:
+    - **edge_weight_normalized**: normalized edge weight (in [0,1])
+    - **degree_normalized**: normalized degree (in [0,1])
+    - **common_neighbors_normalized**: normalized common neighbors (in [0,1])
+
+    Explanation of terms:
+    - **-edge_weight_normalized**  
+    Stronger edges have higher normalized weights (in [0,1])
+
+    - **+ 1/(degree_normalized + 1)**  
+    extra emphasis to low-degree neighbors, counteracts hub dominance by favoring exploration of less-connected neighbors
+
+    - **-common_neighbors_normalized**  
+    Neighbors that share many neighbors with the current node have higher normalized common-neighbor counts. Subtracting this term penalizes redundant paths, promoting discovery of novel graph regions.
 
     Note:
-        The priority is inverted (i.e., lower values are higher priority in a min-heap).
-
-    float
-        The computed priority score (lower values indicate higher priority).
+    - The priority is inverted: lower `score` indicates higher priority in a min-heap.
+    - All input metrics are first normalized to the [0,1] range using global min/max statistics across timestamps.
     """
+
+    (min_w, max_w), (min_d, max_d), (min_c, max_c) = stats
+
     edge_weight = graph[current_node][neighbor].get('weight', 1)  # Default weight is 1
     degree = graph.degree(neighbor)  # Higher degree = more connections
     common_neighbors = len(list(nx.common_neighbors(graph, current_node, neighbor)))  # Number of common neighbors
 
+    edge_weight_normalized = norm(edge_weight, min_w, max_w)
+    degree_normalized = norm(degree, min_d, max_d)
+    common_neighbors_normalized = norm(common_neighbors, min_c, max_c)
+
+    # prioritizes strong, low‐degree, high‐common‐neighbor nodes
+    score = (
+    - edge_weight_normalized        # strong edge → large negative contribution
+    - 1.0 / (degree_normalized + 1) # low degree → large reciprocal → large negative contribution
+    - common_neighbors_normalized   # many common neighbors → large negative contribution
+    )
+
+    # prioritizes strong, high‐degree, high‐common‐neighbor nodes
+    score_old =  -edge_weight_normalized + 1 / (degree_normalized + 1) - common_neighbors_normalized
+    
+    #print("score:", score)
     # Negative because min-heap (lower priority = higher value)
-    return -edge_weight + 1 / (degree + 1) - common_neighbors
+    return score_old
+
+def calculate_priority_normalized(graph, current, neigh, w, d, c, stats):
+    """
+    Tunable priority based on normalized edge weight, degree, and common neighbors.
+
+    Args:
+        graph: NetworkX graph
+        current: Current node
+        neigh: Neighbor node to evaluate
+        w: weight factor for edge strength
+        d: weight factor for high-degree preference
+        c: weight factor for prioritizing shared neighborhood
+        stats: tuple of three tuples ((min_w, max_w), (min_d, max_d), (min_c, max_c))
+
+    Returns:
+        float: Normalized priority score
+    """
+    (min_w, max_w), (min_d, max_d), (min_c, max_c) = stats
+
+    # Raw metrics
+    edge_weight = graph[current][neigh].get('weight', 1)
+    degree = graph.degree(neigh)
+    common_neighbors = len(list(nx.common_neighbors(graph, current, neigh)))
+
+    # Normalize metrics
+    w_n = norm(edge_weight, min_w, max_w)
+    d_n = norm(degree, min_d, max_d)
+    c_n = norm(common_neighbors, min_c, max_c)
+
+    #print(w_n, d_n, c_n)
+
+    # negative priority score for min-heap
+    return -w * w_n - d * d_n - c * c_n
+
 
 def sort_by_priority(graph, current_node, neighbors):
     return sorted(neighbors, key=lambda neighbor: calculate_priority(graph, current_node, neighbor))
@@ -303,18 +406,38 @@ def get_community_ordering(graphs, sorting_key='id'):
     return neighborhoods_ordering
 
 
-def get_priority_bfs_ordering(graphs, start_nodes=None):
+def get_priority_bfs_ordering(graphs, start_nodes=None, stats=None):
     """
-    Perform BFS with priority on each graph, prioritizing edges with the highest influence.
+    Perform a priority-based Breadth-First Search (BFS) traversal on a series of graphs.
+
+    This function computes a BFS ordering for each graph in the input dictionary, where nodes are visited
+    based on a priority score. The priority score is calculated using the `calculate_priority` function,
+    which combines edge weight, node degree, and common neighbors.
 
     Args:
-        graphs (dict): A dictionary of NetworkX graphs for each timestamp.
-        start_nodes (dict, optional): A dictionary specifying the starting node for each timestamp.
-
+        graphs (dict): A dictionary where keys are timestamps and values are NetworkX graphs.
+        start_nodes (dict, optional): A dictionary specifying the starting node for each timestamp. 
+                                      If not provided, the first node (sorted by ID) is used as the start node.
+        stats (tuple, optional): Global statistics for normalization. If not provided, they are computed from the graphs.
+    
     Returns:
-        dict: A dictionary containing BFS ordering of nodes for each graph.
+        dict: A dictionary where keys are timestamps and values are lists of nodes in BFS order.
+
+    Example:
+        graphs = {
+            0: nx.Graph([(1, 2), (2, 3), (3, 4)]),
+            1: nx.Graph([(1, 3), (3, 4), (4, 5)])
+        }
+        start_nodes = {0: 1, 1: 3}
+        bfs_ordering = get_priority_bfs_ordering(graphs, start_nodes)
+        print(bfs_ordering)
+        # Output: {0: [1, 2, 3, 4], 1: [3, 1, 4, 5]}
     """
     bfs_ordering = {}
+
+    if stats is None:
+        stats = compute_global_stats(graphs)
+        print("Global stats:", stats)
 
     # Loop through each graph/timestamp
     for timestamp, graph in graphs.items():
@@ -324,6 +447,7 @@ def get_priority_bfs_ordering(graphs, start_nodes=None):
         ordering = []
         pq = []  # Priority queue (min-heap)
 
+        # Determine the starting node
         start_node = start_nodes.get(timestamp) if start_nodes and timestamp in start_nodes else None
         if start_node and start_node in graph.nodes:
             heapq.heappush(pq, (0, start_node))  # Push (priority, node)
@@ -341,9 +465,56 @@ def get_priority_bfs_ordering(graphs, start_nodes=None):
                 neighbors = graph.neighbors(current_node)
                 for neighbor in neighbors:
                     if neighbor not in visited:
-                        priority = calculate_priority(graph, current_node, neighbor)
+                        priority = calculate_priority(graph, current_node, neighbor, stats)
                         heapq.heappush(pq, (priority, neighbor))
-
         bfs_ordering[timestamp] = ordering
 
+    return bfs_ordering
+
+
+def get_normalized_priority_bfs_ordering(graphs, start_nodes=None, stats=None, w=1.0, d=1.0, c=1.0):
+    """
+    Perform BFS with tunable priority on each graph timestamp.
+
+    Calculates a normalized priority score for a neighbor node based on a combination of edge weight,
+    node degree, and number of common neighbors.
+
+    Args:
+        graphs (dict): timestamp -> networkx.Graph
+        start_nodes (dict): timestamp -> preferred start node
+        stats (tuple): Global statistics for normalization
+        w (float): Coefficient for edge weight
+        d (float): Coefficient for degree preference
+        c (float): Coefficient for common neighbors
+
+    Returns:
+        dict: timestamp -> list of nodes in priority BFS order
+    """
+    if stats is None:
+        stats = compute_global_stats(graphs)
+        print("Global stats:", stats)
+        
+    bfs_ordering = {}
+    for timestamp, graph in graphs.items():
+        visited = set()
+        ordering = []
+        pq = []
+        # Determine start node
+        start = start_nodes.get(timestamp) if start_nodes else None
+        if start and start in graph:
+            heapq.heappush(pq, (0.0, start))
+        else:
+            heapq.heappush(pq, (0.0, sorted(graph.nodes())[0]))
+        # Traverse
+        while pq:
+            priority, node = heapq.heappop(pq)
+            if node in visited:
+                continue
+            visited.add(node)
+            ordering.append(node)
+            for nbr in graph.neighbors(node):
+                if nbr not in visited:
+                    pr = calculate_priority_normalized(graph, node, nbr, w, d, c, stats)
+                    heapq.heappush(pq, (pr, nbr))
+        bfs_ordering[timestamp] = ordering
     return bfs_ordering
