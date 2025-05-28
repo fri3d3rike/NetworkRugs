@@ -69,18 +69,19 @@ def draw_networkrug(graphs, color_encoding='closeness_centrality', colormap='tur
 
 # --- Jupyter Notebook Interface ---
 def interactive_rug(graphs):
-    color_options = [ 'id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
+    color_options = ['id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
     colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
+    mapper_options = ['linear', 'binned']
     
     color_dropdown = Dropdown(options=color_options, value='id', description='Color:')
     colormap_dropdown = Dropdown(options=colormap_options, value='turbo', description='Colormap:')
+    mapper_dropdown = Dropdown(options=mapper_options, value='linear', description='Color Mapping:')
     label_toggle = Checkbox(value=False, description='Show Labels')
     start_toggle = Checkbox(value=False, description='Show Start Node Layer')
-    pixel_slider = IntSlider(value=6, min=2, max=20, step=1, description='Pixel Size:', continuous_update=False)
 
     ui = VBox([
-        HBox([color_dropdown, colormap_dropdown]),
-        HBox([label_toggle, start_toggle, pixel_slider])
+        HBox([color_dropdown, colormap_dropdown, mapper_dropdown]),
+        HBox([label_toggle, start_toggle])
     ])
 
     def update_plot(change=None):
@@ -89,15 +90,16 @@ def interactive_rug(graphs):
             color_encoding=color_dropdown.value,
             colormap=colormap_dropdown.value,
             labels=label_toggle.value,
-            pixel_size=pixel_slider.value,
-            init_start=start_toggle.value
+            pixel_size=6,  # Fixed pixel size
+            init_start=start_toggle.value,
+            mapper_type=mapper_dropdown.value
         )
 
     # Attach all handlers
     color_dropdown.observe(update_plot, names='value')
     colormap_dropdown.observe(update_plot, names='value')
+    mapper_dropdown.observe(update_plot, names='value')
     label_toggle.observe(update_plot, names='value')
-    pixel_slider.observe(update_plot, names='value')
     start_toggle.observe(update_plot, names='value')
 
     display(ui)

@@ -160,33 +160,56 @@ def sort_by_priority(graph, current_node, neighbors):
 
 def get_start_node(graphs, metric='degree', mode='highest'):
     """
-    Select a single consistent start node based on the first graph (timestamp 0 by default).
+    Select a single consistent start node, either:
+      - 'highest' / 'lowest':   extreme on the first graph
+      - 'highest_global' / 'lowest_global': extreme aggregated across all graphs
+    Returns a dict mapping each timestamp to the chosen node.
+    
+    Raises:
+        ValueError: If graphs is empty or if no valid nodes are found.
     """
-    first_timestamp = min(graphs.keys())
-    G0 = graphs[first_timestamp]
-    
-    if metric == 'degree':
-        values = dict(G0.degree())
-    elif metric == 'closeness_centrality':
-        values = nx.closeness_centrality(G0)
-    elif metric == 'betweenness_centrality':
-        values = nx.betweenness_centrality(G0)
-    elif metric == 'eigenvector_centrality':
-        values = nx.eigenvector_centrality(G0, max_iter=10000, tol=1e-6, weight='weight')
-    else:
-        raise ValueError(f"Unsupported metric: {metric}")
+    if not graphs:
+        raise ValueError("Empty graph dictionary provided")
+    def compute_metric(G):
+        if metric == 'degree':
+            return dict(G.degree())
+        elif metric == 'closeness_centrality':
+            return nx.closeness_centrality(G)
+        elif metric == 'betweenness_centrality':
+            return nx.betweenness_centrality(G)
+        elif metric == 'eigenvector_centrality':
+            return nx.eigenvector_centrality(G, max_iter=10000, tol=1e-6, weight='weight')
+        else:
+            raise ValueError(f"Unsupported metric: {metric}")
 
-    if mode == 'highest':
-        chosen_node = max(values, key=values.get)
-    elif mode == 'lowest':
-        chosen_node = min(values, key=values.get)
-    else:
-        raise ValueError(f"Mode must be 'highest' or 'lowest'.")
+    timestamps = sorted(graphs.keys())
+    first_ts = timestamps[0]
 
-    # Now use same node for all timestamps
-    start_nodes = {timestamp: chosen_node for timestamp in graphs.keys()}
-    
-    return start_nodes
+    if mode in ('highest', 'lowest'):
+        # compute only on the first graph
+        values = compute_metric(graphs[first_ts])
+
+    elif mode in ('highest_global', 'lowest_global'):
+        # aggregate across all graphs
+        agg = {}        # node -> sum of metric over all graphs
+        for G in graphs.values():
+            vals = compute_metric(G)
+            for node, score in vals.items():
+                agg[node] = agg.get(node, 0.0) + score
+        values = agg
+
+    else:
+        raise ValueError(f"Unsupported mode: {mode!r}")
+
+    # pick the node with highest or lowest value
+    if 'highest' in mode:
+        chosen = max(values, key=values.get)
+    else:
+        chosen = min(values, key=values.get)
+
+    # same start node for every timestamp
+    return {ts: chosen for ts in timestamps}
+
 
 
 def get_DFS_ordering(graphs, start_nodes=None):
@@ -472,7 +495,7 @@ def get_priority_bfs_ordering(graphs, start_nodes=None, stats=None):
     return bfs_ordering
 
 
-def get_normalized_priority_bfs_ordering(graphs, start_nodes=None, stats=None, w=1.0, d=1.0, c=1.0):
+def get_tunable_priority_bfs_ordering(graphs, start_nodes=None, stats=None, w=1.0, d=1.0, c=1.0):
     """
     Perform BFS with tunable priority on each graph timestamp.
 

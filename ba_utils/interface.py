@@ -267,12 +267,13 @@ def open_rug_window():
         rug_window.destroy()
     rug_window.protocol("WM_DELETE_WINDOW", on_rug_window_close)
 
-    color_options = ['id', 'id2', 'id3', 'degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
-    ordering_options = ['priority', 'priority_tunable', 'dfs', 'bfs']
+    color_options = ['id','degree_centrality', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality']
+    ordering_options = ['priority', 'priority_tunable', 'dfs', 'bfs', 'metric_ordering']
     start_node_options = ['degree', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality', 'id']
-    start_node_mode_options = ['highest', 'lowest']
-    colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
+    start_node_mode_options = ['highest', 'highest_global','lowest', 'lowest_global']
+    colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis', 'YIGnBu', 'cool' ]
     colormap_type_options = ['linear', 'binned']
+    metric_options = ['degree', 'closeness', 'betweenness', 'eigenvector']
 
     color_var = tk.StringVar(value='id')
     order_var = tk.StringVar(value='priority')
@@ -282,31 +283,60 @@ def open_rug_window():
     mapper_type_var = tk.StringVar(value='linear')
     colormap_var = tk.StringVar(value='turbo')
     parameters_var = tk.StringVar(value="w=1,d=1,c=1")
+    metric_var = tk.StringVar(value='degree')
 
     control_frame = ttk.Frame(rug_window)
     control_frame.pack(side='top', fill='x', pady=10)
 
-    ttk.Label(control_frame, text="Color Encoding").grid(row=0, column=0, padx=5)
+    color_label = ttk.Label(control_frame, text="Color Encoding")
+    color_label.grid(row=0, column=0, padx=5)
+    create_tooltip(color_label, "Select the attribute to use for color encoding.")
     ttk.Combobox(control_frame, textvariable=color_var, values=color_options).grid(row=0, column=1, padx=5)
 
     ttk.Label(control_frame, text="Colormap").grid(row=1, column=0, padx=5)
     ttk.Combobox(control_frame, textvariable=colormap_var, values=colormap_options).grid(row=1, column=1, padx=5)
 
     # --- Mapper Type Dropdown ---
-    ttk.Label(control_frame, text="Color Mapping Type:").grid(row=0, column=2, sticky='e', padx=5)
+    color_mapping_label = ttk.Label(control_frame, text="Color Mapping Type:")
+    color_mapping_label.grid(row=0, column=2, sticky='e', padx=5)
+    create_tooltip(color_mapping_label,
+        "Select the type of color mapping to use.\n"
+        "Linear: Maps values linearly across the colormap.\n"
+        "Binned: Maps values to discrete bins in the colormap."
+    )
     ttk.Combobox(control_frame, textvariable=mapper_type_var, values=colormap_type_options).grid(row=0, column=3, padx=5)
 
-    ttk.Label(control_frame, text="Ordering").grid(row=0, column=4, padx=5)
+    ordering_label = ttk.Label(control_frame, text="Ordering")
+    ordering_label.grid(row=0, column=4, padx=5)
+    create_tooltip(ordering_label,
+        "Select the ordering method for the nodes.\n"
+        "Priority: Uses a priority-based BFS ordering.\n"
+        "Priority Tunable: Uses a tunable priority-based BFS ordering.\n"
+        "DFS: Uses a depth-first search ordering.\n"
+        "BFS: Uses a breadth-first search ordering.\n"
+        "Metric Ordering: Orders nodes based on a centrality metric."
+    )
     ttk.Combobox(control_frame, textvariable=order_var, values=ordering_options).grid(row=0, column=5, padx=5)
 
     # --- Start Node Dropdown ---
-    ttk.Label(control_frame, text="Start Node").grid(row=0, column=6, padx=5)
+    start_node_label = ttk.Label(control_frame, text="Start Node")
+    start_node_label.grid(row=0, column=6, padx=5)
+    create_tooltip(start_node_label, "Select the attribute to use for determining the start node.")
     ttk.Combobox(control_frame, textvariable=start_node_var, values=start_node_options).grid(row=0, column=7, padx=5)
 
-    ttk.Label(control_frame, text="Start Node Mode").grid(row=1, column=6, padx=5)
+    start_node_mode_label = ttk.Label(control_frame, text="Start Node Mode")
+    start_node_mode_label.grid(row=1, column=6, padx=5)
+    create_tooltip(start_node_mode_label,
+        "Select the mode for determining the start node.\n"
+        "Highest: Selects the node with the highest value of the selected attribute.\n"
+        "Lowest: Selects the node with the lowest value of the selected attribute.\n"
+        "Highest Global: Selects the node with the highest value across all timestamps.\n"
+        "Lowest Global: Selects the node with the lowest value across all timestamps.")
     ttk.Combobox(control_frame, textvariable=start_node_mode_var, values=start_node_mode_options).grid(row=1, column=7, padx=5)
 
-    ttk.Checkbutton(control_frame, text="Show Labels", variable=label_var).grid(row=1, column=3, padx=5)
+    labels_button = ttk.Checkbutton(control_frame, text="Show Labels", variable=label_var)
+    labels_button.grid(row=1, column=3, padx=5)
+    create_tooltip(labels_button, "Check to show node labels in the visualization.")
 
         # Placeholder for the "Parameters" input field
     parameters_label = None
@@ -332,6 +362,16 @@ def open_rug_window():
                     "|d|: magnitude tunes strength of that effect" 
                 )
                 parameters_entry = ttk.Entry(control_frame, textvariable=parameters_var)
+                parameters_entry.grid(row=1, column=5, padx=5)
+        if order_var.get() == "metric_ordering":
+            if not parameters_label and not parameters_entry:
+                parameters_label = ttk.Label(control_frame, text="Centrality Metric  (?)")
+                parameters_label.grid(row=1, column=4, padx=5)
+                create_tooltip(
+                    parameters_label,
+                    "Select the metric to use for ordering the nodes."
+                )
+                parameters_entry = ttk.Combobox(control_frame, textvariable=metric_var, values=metric_options)
                 parameters_entry.grid(row=1, column=5, padx=5)
         else:
             if parameters_label:
@@ -366,7 +406,7 @@ def open_rug_window():
         elif order_var.get() == "priority_tunable":
             parameters = parameters_var.get()
             if parameters == "":
-                ordering = orderings.get_normalized_priority_bfs_ordering(graphs_data, start_nodes)
+                ordering = orderings.get_tunable_priority_bfs_ordering(graphs_data, start_nodes)
                 print("Using normalized priority BFS with default parameters")
             else:
                 try:
@@ -376,7 +416,7 @@ def open_rug_window():
                     d = float(param_dict.get('d', 1.0))
                     c = float(param_dict.get('c', 1.0))
                     print(f"Using priority tunable BFS ordering with parameters: w={w}, d={d}, c={c}")
-                    ordering = orderings.get_normalized_priority_bfs_ordering(graphs_data, start_nodes, w=w, d=d, c=c)
+                    ordering = orderings.get_tunable_priority_bfs_ordering(graphs_data, start_nodes, w=w, d=d, c=c)
                 except Exception as e:
                     print(f"Error parsing parameters: {e}")
                     return
@@ -386,6 +426,9 @@ def open_rug_window():
         elif order_var.get() == "dfs":
             ordering = orderings.get_DFS_ordering(graphs_data, start_nodes)
             print("Using DFS ordering")
+        elif order_var.get() == "metric_ordering":
+            ordering = orderings.get_centrality_ordering(graphs_data, parameters_entry.get())
+            print("Using metric ordering wiht centrality metric:", parameters_entry.get())
         else:
             ordering = orderings.get_priority_bfs_ordering(graphs_data, start_nodes)
             print("Using default priority BFS ordering")
@@ -417,7 +460,63 @@ def open_rug_window():
     render_rug()
     ttk.Button(control_frame, text="Render Rug", command=render_rug).grid(row=2, column=0, columnspan=4, pady=10)
 
+
+
+
+        # Mapping dictionaries for file naming
+    COLOR_MAPPING = {
+        'id': 'id_coloring',
+        'degree_centrality': 'DC_coloring',
+        'closeness_centrality': 'CC_coloring',
+        'betweenness_centrality': 'BC_coloring',
+        'eigenvector_centrality': 'EC_coloring'
+    }
+
+    START_NODE_MAPPING = {
+        'degree': 'degree',
+        'closeness_centrality': 'CC',
+        'betweenness_centrality': 'BC',
+        'eigenvector_centrality': 'EC',
+        'id': 'id'
+    }
+
+    MODE_MAPPING = {
+        'highest': 'high',
+        'highest_global': 'highest_global',
+        'lowest': 'low',
+        'lowest_global': 'lowest_global'
+    }
+
+    # Assume color_var, colormap_var, order_var, start_node_var, start_node_mode_var are defined elsewhere
+
     def save_figure(fig):
+        if fig:
+            metric = color_var.get()
+            metric_name = COLOR_MAPPING.get(metric, metric)
+            colormap = colormap_var.get()
+            order = order_var.get()
+            if order == "priority_tunable":
+                order = f"priority_tunable_{parameters_var.get()}"
+            elif order == "priority":
+                order = "priority"
+            else:
+                order = f"{order}_ordering"
+            start_node = start_node_var.get()
+            start_mode = start_node_mode_var.get()
+            mode_name = MODE_MAPPING.get(start_mode, start_mode)
+            node_name = START_NODE_MAPPING.get(start_node, start_node)
+            start_str = f",start={mode_name}_{node_name}"
+
+            event_string = "t=50,growth,t=250"
+
+            config_str = f"{metric_name}_{colormap},{order}_{event_string}{start_str}"
+            filename = f"{config_str}.png"
+            os.makedirs("outputs", exist_ok=True)
+            full_path = os.path.join("outputs", filename)
+            fig.savefig(full_path, dpi=300, bbox_inches='tight')
+            print(f"Figure saved as {full_path}")
+
+    def save_figure_old(fig):
         if fig:
             timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
             config_str = (
@@ -440,7 +539,7 @@ def open_rug_window():
 def start_gui():
     global graphs_data
     root = tk.Tk()
-    root.title("NetworkRug Generator")
+    root.title("NetworkRug Data Generator")
     root.geometry("820x1600")
 
     left_frame = ttk.Frame(root)
@@ -448,8 +547,8 @@ def start_gui():
         left_frame.columnconfigure(i, weight=1)
     left_frame.pack(fill='both', expand=True)
 
-    num_nodes_var = tk.IntVar(value=50)
-    num_steps_var = tk.IntVar(value=100)
+    num_nodes_var = tk.IntVar(value=100)
+    num_steps_var = tk.IntVar(value=300)
     intra_strength_var = tk.DoubleVar(value=0.8)
     inter_strength_var = tk.DoubleVar(value=0.1)
     mode_var = tk.StringVar(value='timed')

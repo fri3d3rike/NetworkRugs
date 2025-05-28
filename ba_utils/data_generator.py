@@ -33,7 +33,7 @@ def _percentages_to_counts(state_percentages, all_groups, num_nodes):
         remaining -= 1
     return rounded
 
-def _create_graph(nodes, community_assignment, intra_p, inter_p, connect_communities=True, weight_intra=3, weight_inter=1):
+def _create_graph(nodes, community_assignment, intra_p, inter_p, connect_communities=True, weight_intra=1, weight_inter=1):
     """
     Creates a graph based on community assignments and connection probabilities.
     
