@@ -1,3 +1,4 @@
+# NetworkRugs
 
 ### Ordering Strategies for 1D Pixel Visualization for Dynamic Networks
 
@@ -20,10 +21,6 @@ You can view the project presentation slides [here](assets/BachelorThesis_Presen
 - color.py: Functionality for color mapping
 - neighborhoods.py: Functions related to graph neighborhoods
 
-
-##### Data
-- graph_data.py: Functions for loading and creating graph data
-- Various JSON files containing network data, exported from Cytoscape
 
 ##### Usage
 1. Install dependencies:
