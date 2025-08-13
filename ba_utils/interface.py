@@ -271,7 +271,7 @@ def open_rug_window():
     ordering_options = ['priority', 'priority_tunable', 'dfs', 'bfs', 'metric_ordering']
     start_node_options = ['degree', 'closeness_centrality', 'betweenness_centrality', 'eigenvector_centrality', 'id']
     start_node_mode_options = ['highest', 'highest_global','lowest', 'lowest_global']
-    colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis', 'YIGnBu', 'cool' ]
+    colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis', 'cool' ]
     colormap_type_options = ['linear', 'binned']
     metric_options = ['degree', 'closeness', 'betweenness', 'eigenvector']
 
@@ -572,8 +572,8 @@ def start_gui():
     final_state_var = tk.StringVar(value="{0:10,1:50,2:40}")
     initial_groups_var = tk.StringVar(value="1")
     init_mode_var = tk.StringVar(value="block")
-    split_events_var = tk.StringVar(value="{10: [(0, 20)]}")
-    merge_events_var = tk.StringVar(value="{50: [(0, 1, 20)]}")
+    split_events_var = tk.StringVar(value="{50: [(0, 100)]}")
+    merge_events_var = tk.StringVar(value="{200: [(0, 1, 50)]} ")
     state_input_var = tk.StringVar(value="20={0:100,1:0,2:0}; 40={0:70,1:20,2:10}")
 
     def update_dynamic_inputs(*args):
@@ -616,7 +616,7 @@ def start_gui():
             split_entry.grid(row=2, column=1)
             split_help = ttk.Label(dynamic_widgets_frame, text="(?)")
             split_help.grid(row=2, column=2)
-            create_tooltip(split_help, "Format: {timestamp: [(group to split, duration).]..}\nExample: {10: [(0, 50)]} means at t=10, group 0 splits for 50 timesteps")
+            create_tooltip(split_help, "Format: {timestamp: [(group to split, duration).]..}\nExample: {50: [(0, 100)]} means at t=50, group 0 splits for 100 timesteps")
             
             # Merge Events
             merge_label = ttk.Label(dynamic_widgets_frame, text="Merge Events")
@@ -625,7 +625,7 @@ def start_gui():
             merge_entry.grid(row=3, column=1)
             merge_help = ttk.Label(dynamic_widgets_frame, text="(?)")
             merge_help.grid(row=3, column=2)
-            create_tooltip(merge_help, "Format: {timestep: [(source, destination, duration).]..}\nExample: {20: [(1, 2, 50)]} means at t=20, group 1 merges into group 2 for 50 timesteps")
+            create_tooltip(merge_help, "Format: {timestep: [(source, destination, duration).]..}\nExample: {200: [(0, 1, 50)]} means at t=200, group 1 merges into group 2 for 50 timesteps")
 
     mode_dropdown.bind("<<ComboboxSelected>>", update_dynamic_inputs)
     update_dynamic_inputs()

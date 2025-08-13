@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from ipywidgets import Dropdown, Checkbox, IntSlider, VBox, HBox
+from ipywidgets import Dropdown, Checkbox, IntSlider, VBox, HBox, Button
 from IPython.display import display
 import tkinter as tk
 from tkinter import ttk
@@ -73,18 +73,27 @@ def interactive_rug(graphs):
     colormap_options = ['turbo', 'gist_rainbow', 'ocean', 'rainbow', 'bwr', 'viridis', 'plasma', 'cividis']
     mapper_options = ['linear', 'binned']
     
-    color_dropdown = Dropdown(options=color_options, value='id', description='Color:')
-    colormap_dropdown = Dropdown(options=colormap_options, value='turbo', description='Colormap:')
+    color_dropdown = Dropdown(options=color_options, value='betweenness_centrality', description='Color:')
+    colormap_dropdown = Dropdown(options=colormap_options, value='bwr', description='Colormap:')
     mapper_dropdown = Dropdown(options=mapper_options, value='linear', description='Color Mapping:')
     label_toggle = Checkbox(value=False, description='Show Labels')
-    start_toggle = Checkbox(value=False, description='Show Start Node Layer')
+    start_toggle = Checkbox(value=False, description='Show Start Node Layer')  
+
+    draw_button = Button(description='Draw NetworkRug')
 
     ui = VBox([
         HBox([color_dropdown, colormap_dropdown, mapper_dropdown]),
-        HBox([label_toggle, start_toggle])
+        HBox([label_toggle, start_toggle]),
+        draw_button
     ])
 
     def update_plot(change=None):
+        
+        start_nodes = get_start_node(graphs, metric='betweenness_centrality', mode='highest')
+        #start_nodes = {timestamp: max(graphs[timestamp].nodes()) for timestamp in graphs.keys()}
+
+
+
         draw_networkrug(
             graphs,
             color_encoding=color_dropdown.value,
@@ -92,15 +101,19 @@ def interactive_rug(graphs):
             labels=label_toggle.value,
             pixel_size=6,  # Fixed pixel size
             init_start=start_toggle.value,
-            mapper_type=mapper_dropdown.value
+            mapper_type=mapper_dropdown.value,
+            start_nodes=start_nodes,
         )
 
-    # Attach all handlers
+    ''''
     color_dropdown.observe(update_plot, names='value')
     colormap_dropdown.observe(update_plot, names='value')
     mapper_dropdown.observe(update_plot, names='value')
     label_toggle.observe(update_plot, names='value')
     start_toggle.observe(update_plot, names='value')
+    '''
+
+    draw_button.on_click(update_plot)
 
     display(ui)
     update_plot()
