@@ -1,13 +1,10 @@
+![PDF Preview](assets/slides_preview.jpg)
+
 # NetworkRugs
 
 ### Ordering Strategies for 1D Pixel Visualization for Dynamic Networks
 
-This project explores compact 1D pixel visualizations, called NetworkRugs, for dynamic networks, using a variety of graph-based metrics and node ordering strategies. Implemented in Python with NetworkX and visualized via Matplotlib, the framework enables comparison of different orderings and experimentation with various color encodings
-
-You can view the project presentation slides [here](assets/BachelorThesis_Presentation_Koerte.pdf)
-
-![PDF Preview](assets/slides_preview.jpg)
-
+This project explores compact 1D pixel visualizations, called NetworkRugs, for dynamic networks, using a variety of graph-based metrics and node ordering strategies. Implemented in Python with NetworkX and visualized via Matplotlib, the framework enables comparison of different orderings and experimentation with various color encodings.
 
 #### Abstract
 Analysing how communities form, evolve, and dissolve over time is a key task in many scientific fields, including social sciences, biology, and art history. In domains such as exhibition analysis, understanding how artists affiliate with different stylistic movements or curatorial groupings across decades requires tools that can visually capture temporal changes in group structures. However, existing visualization techniques for dynamic networks often suffer from visual clutter, limited scalability, and disruptions in the analyst’s mental map.
@@ -43,5 +40,11 @@ pip install -r requirements.txt
 import ba_utils.interface as interface
 interface.start_gui()
 ```
+
+
+#### Some results
+![Results](assets/results2.jpg)
+
+![Large NetworkRug](assets/results.jpg)
 
 
